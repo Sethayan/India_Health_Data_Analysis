@@ -17,12 +17,14 @@ Users can:
 The application is built using **Flask** for the backend and **Chart.js** for interactive front-end data visualization.
 
 ---
+## Team Name
+Bit by bit
 
 ##  Team Members
 
-1. Mohit Thorat 
-2. Ayan seth
-3. Kamal Charotia
+1. Mohit Thorat (25m0765)
+2. Ayan seth( 25m0804)
+3. Kamal Charotia (25m0814)
 
 ---
 
@@ -57,4 +59,4 @@ Follow these steps to set up and run the project locally:
 4. Run flask app
    ```bash
    python app.py
-6. Go to the localhost site with 5000 port to access the working site.
+6. Go to the localhost site with 127.0.0.1:5000 port to access the working site.
