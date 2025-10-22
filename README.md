@@ -51,7 +51,7 @@ Follow these steps to set up and run the project locally:
 
 1. Clone this repository or download the source code.
 2. Navigate to the project directory.
-3. Turn on virtual environment.
+3. Creaate and Turn on virtual environment.
 3. Install the required packages inside virtual environment:
    ```bash
    pip install -r requirements.txt
