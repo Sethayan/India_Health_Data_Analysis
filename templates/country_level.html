@@ -14,7 +14,7 @@
 </head>
 
 <body class="p-4">
-    <h2 class="mb-4">India: Physicians per 1000 Population (1960–2020)</h2>
+    <h2 class=" text-center ">India: Physicians per 1000 Population (1960–2020)</h2>
 
     <div class="d-flex justify-content-center mb-4">
         <div class="card shadow-sm text-center" style="width: 12rem;">
@@ -26,8 +26,9 @@
             </div>
         </div>
     </div>
-
-    <canvas id="chart" width="600" height="300"></canvas>
+    <div class="mx-auto" style="width: 800px; height: 500px;">
+        <canvas id="chart"></canvas>
+    </div>
 
     <script>
         const labels = {{ years | tojson }};
