@@ -60,6 +60,6 @@ Follow these steps to set up and run the project locally:
    flask run --debug
 6. Go to the 127.0.0.1:5000 port to access the working site. 
 7. Visit urls 
-a)127.0.0.1:5000\state 
-b)127.0.0.1:5000\country
-c)127.0.0.1:5000\state\{statename}
+a)127.0.0.1:5000\state <br>
+b)127.0.0.1:5000\country <br>
+c)127.0.0.1:5000\state\\{statename} <br>
