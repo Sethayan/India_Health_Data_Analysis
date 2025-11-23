@@ -1,0 +1,152 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}National Overview{% endblock %}
+
+{% block content %}
+<div class="page-header mb-4">
+    <div class="row align-items-center">
+        <div class="col">
+            <h1 class="page-title">
+                <i class="fa fa-dashboard text-primary me-2"></i>
+                National Healthcare Overview
+            </h1>
+            <p class="text-muted mb-0">Overall view of India's healthcare system</p>
+        </div>
+    </div>
+</div>
+
+<!-- Popurlation card -->
+<div class="row mb-4">
+    <div class="col-xl-3 col-md-6">
+        <div class="card stat-card border-0 shadow-sm h-100 bg-primary">
+            <div class="card-body text-white">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h6 class="text-white mb-1">Total Population (2023)</h6>
+                        <h2 class="mb-0 fw-bold">{{ '{:,.0f}'.format(national_stats.get('total_population_2023', 0) / 10000000) }} Cr</h2>
+                        <small class="text-white">{{ national_stats.get('rural_percentage', 0) }}% Rural</small>
+                    </div>
+                    <div class="stat-icon">
+                        <i class="fa fa-users"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Public health center card -->
+    <div class="col-xl-3 col-md-6">
+        <div class="card stat-card border-0 shadow-sm h-100 bg-success">
+            <div class="card-body text-white">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h6 class="text-white mb-1">Primary Health Centres</h6>
+                        <h2 class="mb-0 fw-bold">{{ '{:,}'.format(national_stats.get('total_phcs', 0)) }}</h2>
+                        <small class="text-white">{{ '{:,}'.format(national_stats.get('rural_phcs', 0)) }} Rural | {{ '{:,}'.format(national_stats.get('urban_phcs', 0)) }} Urban</small>
+                    </div>
+                    <div class="stat-icon">
+                        <i class="fa fa-hospital-o"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Community Health Centers -->
+    <div class="col-xl-3 col-md-6">
+        <div class="card stat-card border-0 shadow-sm h-100 bg-info">
+            <div class="card-body text-white">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h6 class="text-white mb-1">Community Health Centres</h6>
+                        <h2 class="mb-0 fw-bold">{{ '{:,}'.format(national_stats.get('total_chcs', 0)) }}</h2>
+                        <small class="text-white">{{ '{:,}'.format(national_stats.get('rural_chcs', 0)) }} Rural | {{ '{:,}'.format(national_stats.get('urban_chcs', 0)) }} Urban</small>
+                    </div>
+                    <div class="stat-icon">
+                        <i class="fa fa-plus-square"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Infant mortality rate -->
+    <div class="col-xl-3 col-md-6">
+        <div class="card stat-card border-0 shadow-sm h-100 bg-warning">
+            <div class="card-body text-white">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h6 class="text-white mb-1">Avg. Infant Mortality Rate</h6>
+                        <h2 class="mb-0 fw-bold">{{ national_stats.get('avg_imr', 0) }}</h2>
+                        <small class="text-white">per 1000 live births</small>
+                    </div>
+                    <div class="stat-icon">
+                        <i class="fa fa-child"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Other statistics -->
+<div class="row g-3 mb-4">
+    <div class="col-xl-2 col-md-4 col-6">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body text-center">
+                <i class="fa fa-building fa-2x text-primary mb-2"></i>
+                <h4 class="fw-bold mb-0">{{ '{:,}'.format(national_stats.get('total_sub_centres', 0)) }}</h4>
+                <small class="text-muted">Sub Centres</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-2 col-md-4 col-6">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body text-center">
+                <i class="fa fa-h-square fa-2x text-success mb-2"></i>
+                <h4 class="fw-bold mb-0">{{ '{:,}'.format(national_stats.get('total_dh', 0)) }}</h4>
+                <small class="text-muted">District Hospitals</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-2 col-md-4 col-6">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body text-center">
+                <i class="fa fa-medkit fa-2x text-info mb-2"></i>
+                <h4 class="fw-bold mb-0">{{ '{:,}'.format(national_stats.get('total_sdh', 0)) }}</h4>
+                <small class="text-muted">Sub-Divisional Hospitals</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-2 col-md-4 col-6">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body text-center">
+                <i class="fa fa-graduation-cap fa-2x text-warning mb-2"></i>
+                <h4 class="fw-bold mb-0">{{ '{:,}'.format(national_stats.get('total_medical_colleges', 0)) }}</h4>
+                <small class="text-muted">Medical Colleges</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-2 col-md-4 col-6">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body text-center">
+                <i class="fa fa-user-md fa-2x text-danger mb-2"></i>
+                <h4 class="fw-bold mb-0">{{ '{:,}'.format(national_stats.get('total_doctors_position_2023', 0)) }}</h4>
+                <small class="text-muted">Doctors at PHCs</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-2 col-md-4 col-6">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body text-center">
+                <i class="fa fa-stethoscope fa-2x text-secondary mb-2"></i>
+                <h4 class="fw-bold mb-0">{{ '{:,}'.format(national_stats.get('total_specialists_position_2023', 0)) }}</h4>
+                <small class="text-muted">Specialists at CHCs</small>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{% endblock %}
