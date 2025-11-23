@@ -147,8 +147,242 @@
     </div>
 </div>
 
+<div class="row mb-4">
+    <div class="col-xl-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white border-0 pb-0">
+                <h5 class="card-title mb-0">
+                    <i class="fa fa-lightbulb-o text-warning me-2"></i>
+                    Key Insights
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="insights-list">
 
+                    {% for insight in insights %}
+                    <div class="insight-item mb-3 p-3 rounded-3 
+                        {% if insight.type == 'critical' %}bg-danger-subtle
+                        {% elif insight.type == 'warning' %}bg-warning-subtle
+                        {% else %}bg-success-subtle{% endif %}">
+                        <div class="d-flex align-items-start">
+                            <div class="insight-icon me-3">
+                                <i class="fa {{ insight.icon }} fa-lg 
+                                    {% if insight.type == 'critical' %}text-danger
+                                    {% elif insight.type == 'warning' %}text-warning
+                                    {% else %}text-success{% endif %}"></i>
+                            </div>
+                            <div class="insight-content">
+                                <h6 class="mb-1 fw-semibold">{{ insight.title }}</h6>
+                                <p class="mb-1 small">{{ insight.description }}</p>
+                                <span class="badge 
+                                    {% if insight.type == 'critical' %}bg-danger
+                                    {% elif insight.type == 'warning' %}bg-warning text-dark
+                                    {% else %}bg-success{% endif %}">
+                                    {{ insight.value }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-xl-8">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white border-0 pb-0">
+                <h5 class="card-title mb-0">
+                    <i class="fa fa-bar-chart text-primary me-2"></i>
+                    Infrastructure Shortfall by State (%)
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="chart-container" style="height: 400px;">
+                    <canvas id="shortfallChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Shortfall Summary -->
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm border-start border-danger border-4">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted mb-1">Sub Centres Shortfall</h6>
+                        <h3 class="fw-bold text-danger mb-0">{{ '{:,}'.format(national_stats.get('total_sc_shortfall', 0)) }}</h3>
+                        <small class="text-muted">Avg: {{ national_stats.get('avg_sc_shortfall', 0) }}%</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm border-start border-warning border-4">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted mb-1">PHCs Shortfall</h6>
+                        <h3 class="fw-bold text-warning mb-0">{{ '{:,}'.format(national_stats.get('total_phc_shortfall', 0)) }}</h3>
+                        <small class="text-muted">Avg: {{ national_stats.get('avg_phc_shortfall', 0) }}%</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm border-start border-info border-4">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted mb-1">CHCs Shortfall</h6>
+                        <h3 class="fw-bold text-info mb-0">{{ '{:,}'.format(national_stats.get('total_chc_shortfall', 0)) }}</h3>
+                        <small class="text-muted">Avg: {{ national_stats.get('avg_chc_shortfall', 0) }}%</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Rankings Section -->
+<div class="row mb-4">
+
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-success text-white">
+                <h6>
+                    <i class="fa fa-trophy me-2"></i>
+                    Best IMR (Top 5)
+                </h6>
+            </div>
+            <div class="card-body p-0">
+                <ul class="list-group list-group-flush">
+                    {% for item in rankings.get('imr_best', []) %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span>
+                            <span class="badge bg-success me-2">{{ loop.index }}</span>
+                            {{ item['State/UT'] }}
+                        </span>
+                        <span class="badge bg-success-subtle text-success">{{ item['IMR Total'] }}</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-danger text-white">
+                <h6>
+                    <i class="fa fa-exclamation-circle me-2"></i>
+                    Highest IMR (Bottom 5)
+                </h6>
+            </div>
+            <div class="card-body p-0">
+                <ul class="list-group list-group-flush">
+                    {% for item in rankings.get('imr_worst', []) %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span>
+                            <span class="badge bg-danger me-2">{{ loop.index }}</span>
+                            {{ item['State/UT'] }}
+                        </span>
+                        <span class="badge bg-danger-subtle text-danger">{{ item['IMR Total'] }}</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-warning text-dark">
+                <h6>
+                    <i class="fa fa-warning me-2"></i>
+                    Highest PHC Shortfall
+                </h6>
+            </div>
+            <div class="card-body p-0">
+                <ul class="list-group list-group-flush">
+                    {% for item in rankings.get('phc_shortfall_worst', []) %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span>
+                            <span class="badge bg-warning text-dark me-2">{{ loop.index }}</span>
+                            {{ item['State/UT'] }}
+                        </span>
+                        <span class="badge bg-warning-subtle text-warning">{{ item['PHCs % Shortfall'] | round | int }}%</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Rural vs Urban Distribution Doughnut chart -->
+<div class="row g-4 mb-4">
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white border-0">
+                <h5 class="card-title mb-0">
+                    <i class="fa fa-pie-chart text-info me-2"></i>
+                    Rural vs Urban Infrastructure
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="chart-container" style="height: 300px;">
+                    <canvas id="ruralUrbanChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white border-0">
+                <h5 class="card-title mb-0">
+                    <i class="fa fa-line-chart text-success me-2"></i>
+                    Healthcare Facility Distribution
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="chart-container" style="height: 300px;">
+                    <canvas id="facilityDistributionChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block extra_js %}
+<script src="{{ url_for('static', filename='js/overview_charts.js') }}"></script>
+<script>
+    const shortfallData = {{ shortfall_data | safe }};
+    const nationalStats = {
+        rural_sub_centres: {{ national_stats.get('rural_sub_centres', 0) }},
+        urban_sub_centres: {{ national_stats.get('urban_sub_centres', 0) }},
+        rural_phcs: {{ national_stats.get('rural_phcs', 0) }},
+        urban_phcs: {{ national_stats.get('urban_phcs', 0) }},
+        rural_chcs: {{ national_stats.get('rural_chcs', 0) }},
+        urban_chcs: {{ national_stats.get('urban_chcs', 0) }},
+        total_sub_centres: {{ national_stats.get('total_sub_centres', 0) }},
+        total_phcs: {{ national_stats.get('total_phcs', 0) }},
+        total_chcs: {{ national_stats.get('total_chcs', 0) }},
+        total_dh: {{ national_stats.get('total_dh', 0) }},
+        total_sdh: {{ national_stats.get('total_sdh', 0) }},
+        total_medical_colleges: {{ national_stats.get('total_medical_colleges', 0) }}
+    };
+    
+    $(document).ready(function() {
+        CreateDashboardCharts(shortfallData, nationalStats);
+    });
+</script>
 {% endblock %}
