@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>State Level Health Data</title>
+
+  <!-- Bootstrap CSS -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+    integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+    crossorigin="anonymous"
+  >
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    body {
+      background-color: #f8f9fa;
+    }
+    .card {
+      border-radius: 1rem;
+    }
+    .card-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #555;
+    }
+    .card-text {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #007bff;
+    }
+  </style>
+</head>
+
+<body class="container py-4">
+
+  <h2 class="text-center mb-4">Health Infrastructure of Indian States</h2>
+
+  <!-- State selection dropdown -->
+  <div class="mb-4 text-center">
+    <select id="stateSelect" class="form-select w-auto d-inline-block">
+      <option value="">Select a state</option>
+      {% for s in states %}
+      <option value="{{ s }}">{{ s }}</option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <!-- Cards grid -->
+  <div class="row g-3 text-center">
+    <div class="col-6 col-md-4 col-lg-2">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title">PHCs - Rural</h5>
+          <p class="card-text" id="phc-rural">—</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-md-4 col-lg-2">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title">PHCs - Urban</h5>
+          <p class="card-text" id="phc-urban">—</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-md-4 col-lg-2">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title">PHCs - Total</h5>
+          <p class="card-text" id="phc-total">—</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-md-4 col-lg-2">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title">CHCs - Rural</h5>
+          <p class="card-text" id="chc-rural">—</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-md-4 col-lg-2">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title">CHCs - Urban</h5>
+          <p class="card-text" id="chc-urban">—</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-md-4 col-lg-2">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title">CHCs - Total</h5>
+          <p class="card-text" id="chc-total">—</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chart -->
+  <div class="mt-5">
+    <canvas id="chart" width="400" height="200"></canvas>
+  </div>
+
+  <!-- Bootstrap JS -->
+  <script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+Zj68XvP+T+G4BfXnEw8K7F4g1gE4"
+    crossorigin="anonymous"
+  ></script>
+
+  <!-- Your main script -->
+  <script>
+    document.getElementById('stateSelect').addEventListener('change', async (e) => {
+      const state = e.target.value;
+      if (!state) return;
+
+      const response = await fetch('/state/' + state, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+      });
+
+      const data = await response.json();
+
+      // update cards
+      document.getElementById("phc-rural").textContent = data['PHCs - Rural'] ?? '—';
+      document.getElementById("phc-urban").textContent = data['PHCs - Urban'] ?? '—';
+      document.getElementById("phc-total").textContent = data['PHCs - Total'] ?? '—';
+      document.getElementById("chc-rural").textContent = data['CHCs - Rural'] ?? '—';
+      document.getElementById("chc-urban").textContent = data['CHCs - Urban'] ?? '—';
+      document.getElementById("chc-total").textContent = data['CHCs - Total'] ?? '—';
+    });
+  </script>
+</body>
+</html>

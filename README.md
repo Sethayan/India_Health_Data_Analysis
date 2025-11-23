@@ -39,10 +39,10 @@ Bit by bit
 -  **Maternal Mortality Ratio (MMR):**  
   Number of maternal deaths per 100,000 live births.
 
--  **State-wise Visualization:**  
+-  **State-wise Health Infrastructure Visualization:**  
   Interactive bar charts powered by Chart.js.
 
--  **Simple & Responsive Dashboard:**  
+-  **Physicians per 1000 people bar chart:**  
   Clean and easy-to-use interface designed for clarity and accessibility.
 
 ---
@@ -53,10 +53,11 @@ Follow these steps to set up and run the project locally:
 
 1. Clone this repository or download the source code.
 2. Navigate to the project directory.
-3. Install the required packages:
+3. Create and Turn on virtual environment.
+3. Install the required packages inside virtual environment:
    ```bash
    pip install -r requirements.txt
 4. Run flask app
    ```bash
-   python app.py
-6. Go to the localhost site with 127.0.0.1:5000 port to access the working site.
+   flask run --debug
+5. Go to the 127.0.0.1:5000 port to access the working site.
