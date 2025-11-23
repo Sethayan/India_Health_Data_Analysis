@@ -24,5 +24,20 @@ def api_national_stats():
     return jsonify(get_national_stats(dataframes))
 
 dataframes = load_all_data()
+
+
+@app.route('/health-indicators')
+def health_indicators():
+    indicators = {}
+    
+    if 'imr' in dataframes and not dataframes['imr'].empty:
+        indicators['imr'] = dataframes['imr'].to_dict('records')
+    
+    if 'birth_death_rate' in dataframes and not dataframes['birth_death_rate'].empty:
+        indicators['birth_death'] = dataframes['birth_death_rate'].to_dict('records')
+        
+    return render_template('health_indicators.html',
+                          indicators=json.dumps(indicators))
+
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
