@@ -1,4 +1,4 @@
-function initDashboardCharts(shortfallData, nationalStats) {
+function CreateDashboardCharts(shortfallData, nationalStats) {
     // Shortfall Chart
     if (shortfallData && shortfallData.labels) {
         const shortfallChart = document.getElementById('shortfallChart');
