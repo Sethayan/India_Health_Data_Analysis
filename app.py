@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request
 from data import load_all_data
+from overview_stats import get_national_stats
 
 app = Flask(__name__)
 
@@ -11,8 +12,7 @@ def dashboard():
     return render_template('dashboard.html', 
                           national_stats=national_stats, 
                           insights=insights,
-                          rankings=rankings,
-                          shortfall_data=json.dumps(shortfall_data))
+                          rankings=rankings)
 
 dataframes = load_all_data()
 if __name__ == '__main__':
