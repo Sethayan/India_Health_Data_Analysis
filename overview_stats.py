@@ -219,3 +219,26 @@ def get_overview_ranking(dataframes):
         rankings['phc_shortfall_worst'] = df_sorted[df_sorted['PHCs % Shortfall'] > 0].head(5)[['State/UT', 'PHCs % Shortfall']].to_dict('records')
     
     return rankings
+
+def get_shortfall(dataframes):
+
+    if 'shortfall' not in dataframes or dataframes['shortfall'].empty:
+        return {}
+    
+    df = dataframes['shortfall'].copy()
+    
+    for col in ['Sub Centres % Shortfall', 'PHCs % Shortfall', 'CHCs % Shortfall']:
+        df[col] = pd.to_numeric(df[col])
+    
+    return {
+        'labels': df['State/UT'].tolist(),
+        'sc_shortfall': df['Sub Centres % Shortfall'].tolist(),
+        'phc_shortfall': df['PHCs % Shortfall'].tolist(),
+        'chc_shortfall': df['CHCs % Shortfall'].tolist(),
+        'sc_required': df['Sub Centres R'].tolist(),
+        'sc_present': df['Sub Centres P'].tolist(),
+        'phc_required': df['PHCs R'].tolist(),
+        'phc_present': df['PHCs P'].tolist(),
+        'chc_required': df['CHCs R'].tolist(),
+        'chc_present': df['CHCs P'].tolist(),
+    }
