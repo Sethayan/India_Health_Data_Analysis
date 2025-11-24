@@ -44,7 +44,7 @@ def get_comparison_data(dataframes):
 def get_yearly_comparison(dataframes):
     data = {}
     
-    # Functional infra comparison
+    
     if 'function_sc_phc_chc_rural' in dataframes and not dataframes['function_sc_phc_chc_rural'].empty:
         df = dataframes['function_sc_phc_chc_rural']
         data['function_2022_2023'] = {
@@ -57,7 +57,7 @@ def get_yearly_comparison(dataframes):
             'chc_2023': df['CHCs March 2023'].tolist(),
         }
     
-    # Manpower comparison
+    
     if 'manpower_part1' in dataframes and not dataframes['manpower_part1'].empty:
         df = dataframes['manpower_part1']
         data['manpower_2022_2023'] = {
