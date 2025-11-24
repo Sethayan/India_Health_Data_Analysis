@@ -4,7 +4,6 @@ from sqlalchemy import func
 def get_national_stats():
     db = get_db()
     stats = {}
-    
     try:
         pop_data = db.query(
             func.sum(models.StatePopulation.pop_2023_total).label('total'),
@@ -118,7 +117,6 @@ def get_national_stats():
 def get_insights():
     db = get_db()
     insights = []
-    
     try:
         phc_shortfall = db.query(models.Shortfall).filter(
             models.Shortfall.phc_shortfall_pct > 0

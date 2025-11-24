@@ -3,7 +3,6 @@ from database import get_db, models
 def get_manpower_data():
     db = get_db()
     manpower_data = {}
-    
     try:
         doctors_data = db.query(models.MOPHCRural).all()
         if doctors_data:

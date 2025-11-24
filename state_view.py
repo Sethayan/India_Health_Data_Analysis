@@ -3,7 +3,6 @@ from database import get_db, models
 def get_state_stats(state_name):
     db = get_db()
     stats = {'state_name': state_name}
-    
     try:
         infra = db.query(models.StateWiseSCPHCCHCCount).filter(
             models.StateWiseSCPHCCHCCount.state_ut == state_name
