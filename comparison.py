@@ -2,8 +2,7 @@ import pandas as pd
 
 def get_comparison_data(dataframes):
     data = {}
-    
-    
+
     if 'function_infra_rural' in dataframes and not dataframes['function_infra_rural'].empty:
         df = dataframes['function_infra_rural']
         data['infra_comparison'] = {
