@@ -66,6 +66,15 @@ def manpower():
         
     return render_template('manpower.html', manpower_data=json.dumps(manpower_data))
 
+@app.route('/comparison')
+def comparison():
+    comparison_data = get_comparison_data(dataframes)
+    yearly_data = get_yearly_comparison(dataframes)
+    
+    return render_template('comparison.html', 
+                          comparison_data=json.dumps(comparison_data),
+                          yearly_data=json.dumps(yearly_data))
+
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    app.run(debug=True, host='0.0.0.0', port=5000) 
