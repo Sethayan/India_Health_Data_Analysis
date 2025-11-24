@@ -1,6 +1,7 @@
 from flask import Flask, jsonify, render_template, request
 from data import load_all_data
 from overview_stats import get_national_stats, get_insights, get_overview_ranking, get_shortfall
+from comparison import get_comparison_data
 import json
 
 app = Flask(__name__)
