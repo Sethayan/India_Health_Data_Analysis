@@ -105,6 +105,88 @@ function initializeManPowerStats(manpowerData) {
             });
         }
 
+
+        if (manpowerData.specialists) {
+
+            const specs = manpowerData.specialists;
+            let totalRequired = 0, totalPosition = 0, totalShortfall = 0;
+
+            specs.forEach(s => {
+                totalRequired += s['Required 2023'] || 0;
+                totalPosition += s['In Position 2023'] || 0;
+                totalShortfall += s['Shortfall 2023'] || 0;
+            });
+
+            $('#specialistsRequired').text(totalRequired);
+            $('#specialistsPosition').text(totalPosition);
+            $('#specialistsShortfall').text(totalShortfall);
+
+            const ctxSpecs = document.getElementById('specialistsChart');
+            if (ctxSpecs) {
+                new Chart(ctxSpecs, {
+                    type: 'bar',
+                    data: {
+                        labels: specs.map(s => truncateLabel(s['State/UT'], 10)),
+                        datasets: [
+                            {
+                                label: 'Required',
+                                data: specs.map(s => s['Required 2023']),
+                                backgroundColor: 'rgba(13, 110, 253, 0.2)',
+                                borderColor: 'rgba(13, 110, 253, 0.8)',
+                                borderWidth: 1
+                            },
+                            {
+                                label: 'In Position',
+                                data: specs.map(s => s['In Position 2023']),
+                                backgroundColor: 'rgba(25, 135, 84, 0.2)',
+                                borderColor: 'rgba(25, 135, 84, 0.8)',
+                                borderWidth: 1
+                            }
+                        ]
+                    },
+                    options: {
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                                labels: {
+                                    usePointStyle: true,
+                                    padding: 15,
+                                    font: { family: "'Inter', sans-serif", size: 12 }
+                                }
+                            },
+                            tooltip: {
+                                backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                                titleFont: { family: "'Inter', sans-serif", size: 13 },
+                                bodyFont: { family: "'Inter', sans-serif", size: 12 },
+                                padding: 12,
+                                cornerRadius: 8
+                            }
+                        },
+                        scales: {
+                            x: { ticks: { font: { size: 11 } }, grid: { display: false } },
+                            y: { grid: { color: 'rgba(0,0,0,0.05)' } }
+                        }
+                    }
+                });
+            }
+
+            const specBody = $('#specialistsTableBody');
+            specBody.empty();
+            specs.forEach(s => {
+                specBody.append(`
+                <tr>
+                    <td>${s['State/UT']}</td>
+                    <td class="text-center">${(s['Required 2023'] || 0)}</td>
+                    <td class="text-center">${(s['Sanctioned 2023'] || 0)}</td>
+                    <td class="text-center">${(s['In Position 2023'] || 0)}</td>
+                    <td class="text-center text-danger">${(s['Vacant 2023'] || 0)}</td>
+                    <td class="text-center text-warning">${(s['Shortfall 2023'] || 0)}</td>
+                </tr>
+            `);
+            });
+        }
+
         const docBody = $('#doctorsTableBody');
         docBody.empty();
         doctors.forEach(d => {
@@ -119,6 +201,77 @@ function initializeManPowerStats(manpowerData) {
                 </tr>
             `);
         });
+
+           if (manpowerData.nursing) {
+
+        const nursing = manpowerData.nursing;
+        let totalRequired = 0, totalPosition = 0, totalVacant = 0;
+
+        nursing.forEach(n => {
+            totalRequired += n['Required 2023'] || 0;
+            totalPosition += n['In Position 2023'] || 0;
+            totalVacant += n['Vacant 2023'] || 0;
+        });
+
+        $('#nursingRequired').text(totalRequired);
+        $('#nursingPosition').text(totalPosition);
+        $('#nursingVacant').text(totalVacant);
+
+        const ctxNursing = document.getElementById('nursingChart');
+        if (ctxNursing) {
+            new Chart(ctxNursing, {
+                type: 'bar',
+                data: {
+                    labels: nursing.map(n => truncateLabel(n['State/UT'], 10)),
+                    datasets: [{
+                        label: 'In Position 2023',
+                        data: nursing.map(n => n['In Position 2023']),
+                        backgroundColor:'rgba(13, 202, 240, 0.8)' ,
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                usePointStyle: true,
+                                padding: 15,
+                                font: { family: "'Inter', sans-serif", size: 12 }
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0,0,0,0.8)',
+                            titleFont: { family: "'Inter', sans-serif", size: 13 },
+                            bodyFont: { family: "'Inter', sans-serif", size: 12 },
+                            padding: 12,
+                            cornerRadius: 8
+                        }
+                    },
+                    scales: {
+                        x: { ticks: { font: { size: 11 }}, grid: { display: false }},
+                        y: { grid: { color: 'rgba(0,0,0,0.05)' } }
+                    }
+                }
+            });
+        }
+
+        const nursingBody = $('#nursingTableBody');
+        nursingBody.empty();
+        nursing.forEach(n => {
+            nursingBody.append(`
+                <tr>
+                    <td>${n['State/UT']}</td>
+                    <td class="text-center">${(n['Required 2023'] || 0)}</td>
+                    <td class="text-center">${(n['Sanctioned 2023'] || 0)}</td>
+                    <td class="text-center">${(n['In Position 2023'] || 0)}</td>
+                    <td class="text-center text-danger">${(n['Vacant 2023'] || 0)}</td>
+                    <td class="text-center text-warning">${(n['Shortfall 2023'] || 0)}</td>
+                </tr>
+            `);
+        });
+    }
     }
 }
 
