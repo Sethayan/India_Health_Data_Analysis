@@ -3,6 +3,7 @@ from data import load_all_data
 from overview_stats import get_national_stats, get_insights, get_overview_ranking, get_shortfall
 from comparison import get_comparison_data, get_yearly_comparison
 from state_view import get_state_stats
+from district_view import get_district_data
 import json
 
 app = Flask(__name__)
@@ -88,6 +89,13 @@ def state_view(state_name):
                           national_stats=national_stats,
                           comparison=comparison,
                           state_name=state_name)
+
+@app.route('/districts')
+def districts():
+    district_data = get_district_data(dataframes)
+    return render_template('districts.html', 
+                          states=district_data['states'],
+                          districts=json.dumps(district_data['districts']))
 
 def get_state_list():
     if 'sc_phc_chc_count' in dataframes and not dataframes['sc_phc_chc_count'].empty:
