@@ -1,0 +1,149 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}Manpower Analysis{% endblock %}
+
+{% block content %}
+<div class="page-header mb-4">
+    <div class="row align-items-center">
+        <div class="col">
+            <h1 class="page-title">
+                <i class="fa fa-users text-primary me-2"></i>
+                Manpower
+            </h1>
+            <p class="text-muted mb-0">Healthcare workforce distribution and vacancy</p>
+        </div>
+    </div>
+</div>
+
+<ul class="nav nav-tabs nav-tabs-modern mb-4" id="manpowerTabs" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#doctors" type="button">
+            <i class="fa fa-user-md me-1"></i> Doctors at PHCs
+        </button>
+    </li>
+</ul>
+
+<div class="tab-content" id="manpowerTabsContent">
+    <div class="tab-pane fade show active" id="doctors" role="tabpanel">
+        <div class="row mb-4">
+            <div class="col-md-3 col-6">
+                <div class="card border-0 shadow-sm bg-primary text-white h-100">
+                    <div class="card-body">
+                        <h6 class="text-white mb-1">Required (2023)</h6>
+                        <h3 class="fw-bold mb-0" id="doctorsRequired">-</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="card border-0 shadow-sm bg-success text-white h-100">
+                    <div class="card-body">
+                        <h6 class="text-white mb-1">In Position (2023)</h6>
+                        <h3 class="fw-bold mb-0" id="doctorsPosition">-</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="card border-0 shadow-sm bg-warning text-white h-100">
+                    <div class="card-body">
+                        <h6 class="text-white mb-1">Sanctioned (2023)</h6>
+                        <h3 class="fw-bold mb-0" id="doctorsSanctioned">-</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="card border-0 shadow-sm bg-danger text-white h-100">
+                    <div class="card-body">
+                        <h6 class="text-white mb-1">Vacant (2023)</h6>
+                        <h3 class="fw-bold mb-0" id="doctorsVacant">-</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4 mb-4">
+            <div class="col-xl-6">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header bg-white border-0">
+                        <h5 class="card-title mb-0">
+                            <i class="fa fa-bar-chart text-primary me-2"></i>
+                            State-wise Doctor Distribution (2023)
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container" style="height: 350px;">
+                            <canvas id="doctorsStateChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-6">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header bg-white border-0">
+                        <h5 class="card-title mb-0">
+                            <i class="fa fa-exchange text-success me-2"></i>
+                            2005 vs 2023 Comparison Of In-Position Doctors
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container" style="height: 350px;">
+                            <canvas id="doctorsCompChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white border-0">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">
+                        <i class="fa fa-table text-primary me-2"></i>
+                        Detailed State-wise Data
+                    </h5>
+                    <input type="text" class="form-control form-control-sm" style="width: 200px;"
+                        placeholder="Search state..." id="doctorsSearch">
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>State/UT</th>
+                                <th class="text-center">Required 2023</th>
+                                <th class="text-center">Sanctioned 2023</th>
+                                <th class="text-center">In Position 2023</th>
+                                <th class="text-center">Vacant 2023</th>
+                                <th class="text-center">Shortfall 2023</th>
+                            </tr>
+                        </thead>
+                        <tbody id="doctorsTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/manpower.js') }}"></script>
+<script>
+    const manpowerData = {{ manpower_data | safe }};
+
+    $(document).ready(function () {
+        initializeManPowerStats(manpowerData);
+
+        // Search functionality
+        $('#doctorsSearch').on('keyup', function () {
+            const value = $(this).val().toLowerCase();
+            $('#doctorsTableBody tr').filter(function () {
+                $(this).toggle($(this).text().toLowerCase().includes(value));
+            });
+        });
+    });
+</script>
+{% endblock %}

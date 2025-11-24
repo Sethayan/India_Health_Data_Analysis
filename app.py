@@ -42,5 +42,17 @@ def health_indicators():
     return render_template('health_indicators.html',
                           indicators=json.dumps(indicators))
 
+
+@app.route('/manpower')
+def manpower():
+    manpower_data = {}
+    
+    if 'mo_phc_rural' in dataframes and not dataframes['mo_phc_rural'].empty:
+        df = dataframes['mo_phc_rural'].copy()
+        manpower_data['doctors'] = df.to_dict('records')
+
+    return render_template('manpower.html', manpower_data=json.dumps(manpower_data))
+
+
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
