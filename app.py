@@ -97,6 +97,15 @@ def districts():
                           states=district_data['states'],
                           districts=json.dumps(district_data['districts']))
 
+@app.route('/comparison')
+def comparison():
+    comparison_data = get_comparison_data(dataframes)
+    yearly_data = get_yearly_comparison(dataframes)
+    
+    return render_template('comparison.html', 
+                          comparison_data=json.dumps(comparison_data),
+                          yearly_data=json.dumps(yearly_data))
+
 def get_state_list():
     if 'sc_phc_chc_count' in dataframes and not dataframes['sc_phc_chc_count'].empty:
         return dataframes['sc_phc_chc_count']['State/UT'].tolist()
@@ -109,15 +118,6 @@ def inject_common_data():
     }
 
 dataframes = load_all_data()
-@app.route('/comparison')
-def comparison():
-    comparison_data = get_comparison_data(dataframes)
-    yearly_data = get_yearly_comparison(dataframes)
-    
-    return render_template('comparison.html', 
-                          comparison_data=json.dumps(comparison_data),
-                          yearly_data=json.dumps(yearly_data))
-
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000) 
