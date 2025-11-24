@@ -2,7 +2,7 @@ function initComparisonCharts(comparisonData, yearlyData) {
     if (comparisonData && comparisonData.infra_comparison) {
         const infra = comparisonData.infra_comparison;
 
-        // SC Comparison Chart
+        
         const scCtx = document.getElementById('scComparisonChart');
         if (scCtx) {
             new Chart(scCtx, {
@@ -124,7 +124,7 @@ function initComparisonCharts(comparisonData, yearlyData) {
             });
         }
 
-        // CHC Comparison Chart
+        
         const chcCtx = document.getElementById('chcComparisonChart');
         if (chcCtx) {
             new Chart(chcCtx, {
@@ -185,7 +185,7 @@ function initComparisonCharts(comparisonData, yearlyData) {
             });
         }
 
-        // Populate table
+        
         const tbody = $('#infraTableBody');
         tbody.empty();
         for (let i = 0; i < infra.labels.length; i++) {
@@ -280,12 +280,12 @@ function initComparisonCharts(comparisonData, yearlyData) {
         }
     }
 
-    // 2022 vs 2023 Charts
+    
     if (yearlyData && yearlyData.function_2022_2023) {
         const yearly = yearlyData.function_2022_2023;
         const ctx = document.getElementById('yearly2022Chart');
         if (ctx) {
-            // Calculate totals
+            
             const sc2022Total = yearly.sc_2022.reduce((a, b) => a + b, 0);
             const sc2023Total = yearly.sc_2023.reduce((a, b) => a + b, 0);
             const phc2022Total = yearly.phc_2022.reduce((a, b) => a + b, 0);
