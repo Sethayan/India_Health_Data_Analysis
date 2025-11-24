@@ -21,6 +21,21 @@
             <i class="fa fa-user-md me-1"></i> Doctors at PHCs
         </button>
     </li>
+        <li class="nav-item" role="presentation">
+        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#specialists" type="button">
+            <i class="fa fa-stethoscope me-1"></i> Specialists at CHCs
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#nursing" type="button">
+            <i class="fa fa-medkit me-1"></i> Nursing Staff
+        </button>
+    </li>
+        <li class="nav-item" role="presentation">
+        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#pharmacists" type="button">
+            <i class="fa fa-flask me-1"></i> Pharmacists
+        </button>
+    </li>
 </ul>
 
 <div class="tab-content" id="manpowerTabsContent">
@@ -118,6 +133,206 @@
                             </tr>
                         </thead>
                         <tbody id="doctorsTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+     <div class="tab-pane fade" id="specialists" role="tabpanel">
+        <div class="row g-3 mb-4">
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm bg-primary text-white h-100">
+                    <div class="card-body">
+                        <h6 class="text-white mb-1">Required (2023)</h6>
+                        <h3 class="fw-bold mb-0" id="specialistsRequired">-</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm bg-success text-white h-100">
+                    <div class="card-body">
+                        <h6 class="text-white mb-1">In Position (2023)</h6>
+                        <h3 class="fw-bold mb-0" id="specialistsPosition">-</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm bg-danger text-white h-100">
+                    <div class="card-body">
+                        <h6 class="text-white mb-1">Shortfall (2023)</h6>
+                        <h3 class="fw-bold mb-0" id="specialistsShortfall">-</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row g-4 mb-4">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white border-0">
+                        <h5 class="card-title mb-0">
+                            <i class="fa fa-bar-chart text-success me-2"></i>
+                            Specialists: Required vs In Position (2023)
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container" style="height: 400px;">
+                            <canvas id="specialistsChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white border-0">
+                <h5 class="card-title mb-0">
+                    <i class="fa fa-table text-success me-2"></i>
+                    State-wise Specialists Data
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>State/UT</th>
+                                <th class="text-center">Required 2023</th>
+                                <th class="text-center">Sanctioned 2023</th>
+                                <th class="text-center">In Position 2023</th>
+                                <th class="text-center">Vacant 2023</th>
+                                <th class="text-center">Shortfall 2023</th>
+                            </tr>
+                        </thead>
+                        <tbody id="specialistsTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="tab-pane fade" id="nursing" role="tabpanel">
+        <div class="row g-3 mb-4">
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm bg-info text-white h-100">
+                    <div class="card-body">
+                        <h6 class="text-white mb-1">Required (2023)</h6>
+                        <h3 class="fw-bold mb-0" id="nursingRequired">-</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm bg-success text-white h-100">
+                    <div class="card-body">
+                        <h6 class="text-white mb-1">In Position (2023)</h6>
+                        <h3 class="fw-bold mb-0" id="nursingPosition">-</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm bg-danger text-white h-100">
+                    <div class="card-body">
+                        <h6 class="text-white mb-1">Vacant (2023)</h6>
+                        <h3 class="fw-bold mb-0" id="nursingVacant">-</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-white border-0">
+                <h5 class="card-title mb-0">
+                    <i class="fa fa-bar-chart text-info me-2"></i>
+                    Nursing Staff Distribution
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="chart-container" style="height: 400px;">
+                    <canvas id="nursingChart"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>State/UT</th>
+                                <th class="text-center">Required 2023</th>
+                                <th class="text-center">Sanctioned 2023</th>
+                                <th class="text-center">In Position 2023</th>
+                                <th class="text-center">Vacant 2023</th>
+                                <th class="text-center">Shortfall 2023</th>
+                            </tr>
+                        </thead>
+                        <tbody id="nursingTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+        <div class="tab-pane fade" id="pharmacists" role="tabpanel">
+        <div class="row g-3 mb-4">
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm bg-warning text-white h-100">
+                    <div class="card-body">
+                        <h6 class="text-white mb-1">Required (2023)</h6>
+                        <h3 class="fw-bold mb-0" id="pharmacistsRequired">-</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm bg-success text-white h-100">
+                    <div class="card-body">
+                        <h6 class="text-white mb-1">In Position (2023)</h6>
+                        <h3 class="fw-bold mb-0" id="pharmacistsPosition">-</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm bg-danger text-white h-100">
+                    <div class="card-body">
+                        <h6 class="text-white mb-1">Vacant (2023)</h6>
+                        <h3 class="fw-bold mb-0" id="pharmacistsVacant">-</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-white border-0">
+                <h5 class="card-title mb-0">
+                    <i class="fa fa-bar-chart text-warning me-2"></i>
+                    Pharmacists Distribution
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="chart-container" style="height: 400px;">
+                    <canvas id="pharmacistsChart"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>State/UT</th>
+                                <th class="text-center">Required 2023</th>
+                                <th class="text-center">Sanctioned 2023</th>
+                                <th class="text-center">In Position 2023</th>
+                                <th class="text-center">Vacant 2023</th>
+                                <th class="text-center">Shrotfall 2023</th>
+                            </tr>
+                        </thead>
+                        <tbody id="pharmacistsTableBody">
                         </tbody>
                     </table>
                 </div>

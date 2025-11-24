@@ -52,6 +52,18 @@ def manpower():
         df = dataframes['mo_phc_rural'].copy()
         manpower_data['doctors'] = df.to_dict('records')
 
+    if 'specialist_chc_rural' in dataframes and not dataframes['specialist_chc_rural'].empty:
+        df = dataframes['specialist_chc_rural'].copy()
+        manpower_data['specialists'] = df.to_dict('records')
+    
+    if 'nursing_rural' in dataframes and not dataframes['nursing_rural'].empty:
+        df = dataframes['nursing_rural'].copy()
+        manpower_data['nursing'] = df.to_dict('records')
+
+    if 'pharmacist_rural' in dataframes and not dataframes['pharmacist_rural'].empty:
+        df = dataframes['pharmacist_rural'].copy()
+        manpower_data['pharmacists'] = df.to_dict('records')
+        
     return render_template('manpower.html', manpower_data=json.dumps(manpower_data))
 
 
