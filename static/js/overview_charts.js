@@ -1,5 +1,4 @@
 function CreateDashboardCharts(shortfallData, nationalStats) {
-    // Shortfall Chart
     if (shortfallData && shortfallData.labels) {
         const shortfallChart = document.getElementById('shortfallChart');
         if (shortfallChart) {
@@ -96,7 +95,6 @@ function CreateDashboardCharts(shortfallData, nationalStats) {
         }
     }
 
-    // Rural and Urban infra doughnut chart including PHC, CHC and SC
     const ruralUrbanCtx = document.getElementById('ruralUrbanChart');
     if (ruralUrbanCtx && nationalStats) {
         new Chart(ruralUrbanCtx, {

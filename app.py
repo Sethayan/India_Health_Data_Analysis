@@ -2,11 +2,12 @@ from flask import Flask, jsonify, render_template, request
 from data import load_all_data
 from overview_stats import get_national_stats, get_insights, get_overview_ranking, get_shortfall
 from comparison import get_comparison_data, get_yearly_comparison
+from state_view import get_state_stats
+from district_view import get_district_data
 import json
 
 app = Flask(__name__)
 
-# Routes
 @app.route('/')
 def dashboard():
     national_stats = get_national_stats(dataframes)
@@ -23,9 +24,6 @@ def dashboard():
 @app.route('/api/national-stats')
 def api_national_stats():
     return jsonify(get_national_stats(dataframes))
-
-dataframes = load_all_data()
-
 
 @app.route('/health-indicators')
 def health_indicators():
@@ -66,6 +64,51 @@ def manpower():
         
     return render_template('manpower.html', manpower_data=json.dumps(manpower_data))
 
+@app.route('/state/<state_name>')
+def state_view(state_name):
+    state_stats = get_state_stats(state_name, dataframes)
+    national_stats = get_national_stats(dataframes)
+    
+    comparison = {}
+    if 'function_infra_rural' in dataframes and not dataframes['function_infra_rural'].empty:
+        df = dataframes['function_infra_rural']
+        state_data = df[df['State/UT'] == state_name]
+        if not state_data.empty:
+            row = state_data.iloc[0]
+            comparison['infra'] = {
+                'sc_2005': int(row['Sub Centre 2005']),
+                'sc_2023': int(row['Sub Centre 2023']),
+                'phc_2005': int(row['PHCs 2005']),
+                'phc_2023': int(row['PHCs 2023']),
+                'chc_2005': int(row['CHCs 2005']),
+                'chc_2023': int(row['CHCs 2023']),
+            }
+    
+    return render_template('state_view.html', 
+                          state_stats=state_stats, 
+                          national_stats=national_stats,
+                          comparison=comparison,
+                          state_name=state_name)
+
+@app.route('/districts')
+def districts():
+    district_data = get_district_data(dataframes)
+    return render_template('districts.html', 
+                          states=district_data['states'],
+                          districts=json.dumps(district_data['districts']))
+
+def get_state_list():
+    if 'sc_phc_chc_count' in dataframes and not dataframes['sc_phc_chc_count'].empty:
+        return dataframes['sc_phc_chc_count']['State/UT'].tolist()
+    return []
+
+@app.context_processor
+def inject_common_data():
+    return {
+        'states': get_state_list()
+    }
+
+dataframes = load_all_data()
 @app.route('/comparison')
 def comparison():
     comparison_data = get_comparison_data(dataframes)

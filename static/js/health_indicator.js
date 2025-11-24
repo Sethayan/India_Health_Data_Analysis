@@ -123,7 +123,6 @@ function populateHealthIndicatorChart(indicatorData) {
             $('#lowestBRState').text(sortedBR[sortedBR.length - 1]['State/UT']);
             $('#lowestBRValue').text('BR: ' + sortedBR[sortedBR.length - 1]['Birth Rate Total']);
 
-            // Comparison Chart
             const compCtx = document.getElementById('birthDeathCompChart');
             if (compCtx) {
                 new Chart(compCtx, {

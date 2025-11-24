@@ -1,0 +1,565 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}{{ state_name }} - State Profile{% endblock %}
+
+{% block content %}
+<div class="page-header mb-4">
+    <div class="row align-items-center">
+        <div class="col">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-2">
+                    <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+                    <li class="breadcrumb-item active">{{ state_name }}</li>
+                </ol>
+            </nav>
+            <h1 class="page-title">
+                <i class="fa fa-map-marker text-primary me-2"></i>
+                {{ state_name }}
+            </h1>
+            <p class="text-muted mb-0">State Wise Healthcare Info </p>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-xl-3 col-md-6">
+        <div class="card border-0 shadow-sm h-100 bg-primary">
+            <div class="card-body text-white">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="text-white mb-1">Population (2023)</h6>
+                        <h3 class="fw-bold mb-0">{{ '{:,.0f}'.format(state_stats.get('population_2023', 0) / 100000) }} L</h3>
+                        <small class="text-white">{{ state_stats.get('rural_percentage', 0) }}% Rural</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+        <div class="card border-0 shadow-sm h-100 bg-success">
+            <div class="card-body text-white">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="text-white mb-1">Total PHCs</h6>
+                        <h3 class="fw-bold mb-0">{{ '{:,}'.format(state_stats.get('total_phcs', 0)) }}</h3>
+                        <small class="text-white">{{ state_stats.get('phcs_rural', 0) }} Rural | {{ state_stats.get('phcs_urban', 0) }} Urban</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+        <div class="card border-0 shadow-sm h-100 bg-info">
+            <div class="card-body text-white">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="text-white mb-1">Total CHCs</h6>
+                        <h3 class="fw-bold mb-0">{{ '{:,}'.format(state_stats.get('total_chcs', 0)) }}</h3>
+                        <small class="text-white">{{ state_stats.get('chcs_rural', 0) }} Rural | {{ state_stats.get('chcs_urban', 0) }} Urban</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-xl-3 col-md-6">
+        <div class="card border-0 shadow-sm h-100 bg-warning">
+            <div class="card-body text-white">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="text-white mb-1">Infant Mortality Rate</h6>
+                        <h3 class="fw-bold mb-0">{{ state_stats.get('imr_total', 'NA') }}</h3>
+                        <small class="text-white">per 1000 live births</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ul class="nav nav-tabs nav-tabs-modern mb-4" id="stateTabs" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="infra-tab" data-bs-toggle="tab" data-bs-target="#infrastructure" type="button">
+            <i class="fa fa-building me-1"></i> Infrastructure
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="demo-tab" data-bs-toggle="tab" data-bs-target="#demographics" type="button">
+            <i class="fa fa-pie-chart me-1"></i> Demographics
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="health-tab" data-bs-toggle="tab" data-bs-target="#health" type="button">
+            <i class="fa fa-heartbeat me-1"></i> Health Indicators
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="compare-tab" data-bs-toggle="tab" data-bs-target="#comparison" type="button">
+            <i class="fa fa-exchange me-1"></i> 2005 vs 2023
+        </button>
+    </li>
+</ul>
+
+<div class="tab-content" id="stateTabsContent">
+    <div class="tab-pane fade show active" id="infrastructure" role="tabpanel">
+        <div class="row g-4">
+            <div class="col-lg-6">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header bg-white border-0">
+                        <h5 class="card-title mb-0">
+                            <i class="fa fa-building text-primary me-2"></i>
+                            Primary Healthcare Facilities
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Facility Type</th>
+                                        <th class="text-center">Rural</th>
+                                        <th class="text-center">Urban</th>
+                                        <th class="text-center">Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><i class="fa fa-home text-muted me-2"></i>Sub Centres</td>
+                                        <td class="text-center">{{ '{:,}'.format(state_stats.get('sub_centres_rural', 0)) }}</td>
+                                        <td class="text-center">{{ '{:,}'.format(state_stats.get('sub_centres_urban', 0)) }}</td>
+                                        <td class="text-center fw-bold">{{ '{:,}'.format(state_stats.get('total_sub_centres', 0)) }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td><i class="fa fa-hospital-o text-success me-2"></i>PHCs</td>
+                                        <td class="text-center">{{ '{:,}'.format(state_stats.get('phcs_rural', 0)) }}</td>
+                                        <td class="text-center">{{ '{:,}'.format(state_stats.get('phcs_urban', 0)) }}</td>
+                                        <td class="text-center fw-bold">{{ '{:,}'.format(state_stats.get('total_phcs', 0)) }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td><i class="fa fa-plus-square text-info me-2"></i>CHCs</td>
+                                        <td class="text-center">{{ '{:,}'.format(state_stats.get('chcs_rural', 0)) }}</td>
+                                        <td class="text-center">{{ '{:,}'.format(state_stats.get('chcs_urban', 0)) }}</td>
+                                        <td class="text-center fw-bold">{{ '{:,}'.format(state_stats.get('total_chcs', 0)) }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-6">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header bg-white border-0">
+                        <h5 class="card-title mb-0">
+                            <i class="fa fa-h-square text-success me-2"></i>
+                            Other Healthcare Facilities
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-4">
+                                <div class="text-center p-3 bg-light rounded-3">
+                                    <i class="fa fa-medkit fa-2x text-info mb-2"></i>
+                                    <h3 class="fw-bold mb-0">{{ state_stats.get('sdh', 0) }}</h3>
+                                    <small class="text-muted">Sub-Div. Hospitals</small>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="text-center p-3 bg-light rounded-3">
+                                    <i class="fa fa-h-square fa-2x text-success mb-2"></i>
+                                    <h3 class="fw-bold mb-0">{{ state_stats.get('dh', 0) }}</h3>
+                                    <small class="text-muted">District Hospitals</small>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="text-center p-3 bg-light rounded-3">
+                                    <i class="fa fa-graduation-cap fa-2x text-warning mb-2"></i>
+                                    <h3 class="fw-bold mb-0">{{ state_stats.get('medical_colleges', 0) }}</h3>
+                                    <small class="text-muted">Medical Colleges</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <hr class="my-4">
+                        <h6 class="text-muted mb-3">Facility Shortfall</h6>
+                        <div class="row g-2">
+                            <div class="col-4">
+                                <div class="progress-label d-flex justify-content-between mb-1">
+                                    <span class="small">SC Shortfall</span>
+                                    <span class="small fw-bold">{{ state_stats.get('sc_shortfall_pct', 0) }}%</span>
+                                </div>
+                                <div class="progress" style="height: 8px;">
+                                    <div class="progress-bar bg-danger" style="width: {{ state_stats.get('sc_shortfall_pct', 0) }}%"></div>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="progress-label d-flex justify-content-between mb-1">
+                                    <span class="small">PHC Shortfall</span>
+                                    <span class="small fw-bold">{{ state_stats.get('phc_shortfall_pct', 0) }}%</span>
+                                </div>
+                                <div class="progress" style="height: 8px;">
+                                    <div class="progress-bar bg-warning" style="width: {{ state_stats.get('phc_shortfall_pct', 0) }}%"></div>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="progress-label d-flex justify-content-between mb-1">
+                                    <span class="small">CHC Shortfall</span>
+                                    <span class="small fw-bold">{{ state_stats.get('chc_shortfall_pct', 0) }}%</span>
+                                </div>
+                                <div class="progress" style="height: 8px;">
+                                    <div class="progress-bar bg-info" style="width: {{ state_stats.get('chc_shortfall_pct', 0) }}%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white border-0">
+                        <h5 class="card-title mb-0">
+                            <i class="fa fa-bar-chart text-primary me-2"></i>
+                            Rural vs Urban Distribution
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container" style="height: 300px;">
+                            <canvas id="stateInfraChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="tab-pane fade" id="demographics" role="tabpanel">
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header bg-white border-0">
+                        <h5 class="card-title mb-0">
+                            <i class="fa fa-users text-primary me-2"></i>
+                            Population
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item d-flex justify-content-between">
+                                <span>Total (2023 Est.)</span>
+                                <strong>{{ '{:,.0f}'.format(state_stats.get('population_2023', 0)) }}</strong>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between">
+                                <span>Rural</span>
+                                <strong>{{ '{:,.0f}'.format(state_stats.get('population_rural', 0)) }}</strong>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between">
+                                <span>Urban</span>
+                                <strong>{{ '{:,.0f}'.format(state_stats.get('population_urban', 0)) }}</strong>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between">
+                                <span>Rural %</span>
+                                <strong>{{ state_stats.get('rural_percentage', 0) }}%</strong>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header bg-white border-0">
+                        <h5 class="card-title mb-0">
+                            <i class="fa fa-map text-success me-2"></i>
+                            Geography
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item d-flex justify-content-between">
+                                <span>Total Area</span>
+                                <strong>{{ '{:,.0f}'.format(state_stats.get('total_area', 0)) }} sq km</strong>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between">
+                                <span>Rural Area</span>
+                                <strong>{{ '{:,.0f}'.format(state_stats.get('rural_area', 0)) }} sq km</strong>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between">
+                                <span>Districts</span>
+                                <strong>{{ state_stats.get('districts', 0) }}</strong>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between">
+                                <span>Villages</span>
+                                <strong>{{ '{:,}'.format(state_stats.get('villages', 0)) }}</strong>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header bg-white border-0">
+                        <h5 class="card-title mb-0">
+                            <i class="fa fa-compress text-info me-2"></i>
+                            Population Density
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item d-flex justify-content-between">
+                                <span>Overall</span>
+                                <strong>{{ state_stats.get('density_total', 0) }} /sq km</strong>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between">
+                                <span>Rural</span>
+                                <strong>{{ state_stats.get('density_rural', 0) }} /sq km</strong>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between">
+                                <span>Urban</span>
+                                <strong>{{ state_stats.get('density_urban', 0) }} /sq km</strong>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body">
+                        <div class="chart-container" style="height: 300px;">
+                            <canvas id="populationChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="tab-pane fade" id="health" role="tabpanel">
+        <div class="row g-4">
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header bg-white border-0">
+                        <h5 class="card-title mb-0">
+                            <i class="fa fa-child text-warning me-2"></i>
+                            Infant Mortality Rate (2020)
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3 text-center">
+                            <div class="col-4">
+                                <div class="p-3 bg-warning-subtle rounded-3">
+                                    <h2 class="fw-bold text-warning mb-0">{{ state_stats.get('imr_total', 'N/A') }}</h2>
+                                    <small class="text-muted">Total</small>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="p-3 bg-success-subtle rounded-3">
+                                    <h2 class="fw-bold text-success mb-0">{{ state_stats.get('imr_rural', 'N/A') }}</h2>
+                                    <small class="text-muted">Rural</small>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="p-3 bg-info-subtle rounded-3">
+                                    <h2 class="fw-bold text-info mb-0">{{ state_stats.get('imr_urban', 'N/A') }}</h2>
+                                    <small class="text-muted">Urban</small>
+                                </div>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="comparison-bar mt-3">
+                            <p class="small text-muted mb-2">Compared to National Average ({{ national_stats.get('avg_imr', 0) }})</p>
+                            {% set imr_diff = state_stats.get('imr_total', 0) - national_stats.get('avg_imr', 0) %}
+                            {% if imr_diff > 0 %}
+                            <div class="alert alert-danger py-2 mb-0">
+                                <i class="fa fa-arrow-up me-1"></i> {{ '{:.1f}'.format(imr_diff) }} higher than national average
+                            </div>
+                            {% elif imr_diff < 0 %}
+                            <div class="alert alert-success py-2 mb-0">
+                                <i class="fa fa-arrow-down me-1"></i> {{ '{:.1f}'.format(imr_diff|abs) }} lower than national average
+                            </div>
+                            {% else %}
+                            <div class="alert alert-info py-2 mb-0">
+                                <i class="fa fa-equals me-1"></i> Equal to national average
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header bg-white border-0">
+                        <h5 class="card-title mb-0">
+                            <i class="fa fa-heartbeat text-danger me-2"></i>
+                            Vital Statistics (2020)
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-4">
+                            <div class="col-6">
+                                <h6 class="text-muted mb-3"><i class="fa fa-plus-circle text-success me-1"></i> Birth Rate</h6>
+                                <div class="d-flex justify-content-around text-center">
+                                    <div>
+                                        <h3 class="fw-bold text-success mb-0">{{ state_stats.get('birth_rate', 'N/A') }}</h3>
+                                        <small class="text-muted">Total</small>
+                                    </div>
+                                    <div>
+                                        <h3 class="fw-bold text-info mb-0">{{ state_stats.get('birth_rate_rural', 'N/A') }}</h3>
+                                        <small class="text-muted">Rural</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <h6 class="text-muted mb-3"><i class="fa fa-minus-circle text-danger me-1"></i> Death Rate</h6>
+                                <div class="d-flex justify-content-around text-center">
+                                    <div>
+                                        <h3 class="fw-bold text-danger mb-0">{{ state_stats.get('death_rate', 'N/A') }}</h3>
+                                        <small class="text-muted">Total</small>
+                                    </div>
+                                    <div>
+                                        <h3 class="fw-bold text-warning mb-0">{{ state_stats.get('death_rate_rural', 'N/A') }}</h3>
+                                        <small class="text-muted">Rural</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="chart-container mt-3" style="height: 150px;">
+                            <canvas id="vitalStatsChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="tab-pane fade" id="comparison" role="tabpanel">
+        {% if comparison %}
+        <div class="row g-4">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white border-0">
+                        <h5 class="card-title mb-0">
+                            <i class="fa fa-exchange text-primary me-2"></i>
+                            Infrastructure Growth: 2005 vs 2023
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Facility</th>
+                                        <th class="text-center">2005</th>
+                                        <th class="text-center">2023</th>
+                                        <th class="text-center">Change</th>
+                                        <th class="text-center">Growth %</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% set sc_change = comparison.infra.sc_2023 - comparison.infra.sc_2005 %}
+                                    {% set sc_growth = ((sc_change / comparison.infra.sc_2005) * 100) if comparison.infra.sc_2005 > 0 else 0 %}
+                                    <tr>
+                                        <td><i class="fa fa-home text-muted me-2"></i>Sub Centres</td>
+                                        <td class="text-center">{{ '{:,}'.format(comparison.infra.sc_2005) }}</td>
+                                        <td class="text-center">{{ '{:,}'.format(comparison.infra.sc_2023) }}</td>
+                                        <td class="text-center {% if sc_change >= 0 %}text-success{% else %}text-danger{% endif %}">
+                                            {% if sc_change >= 0 %}+{% endif %}{{ '{:,}'.format(sc_change) }}
+                                        </td>
+                                        <td class="text-center">
+                                            <span class="badge {% if sc_growth >= 0 %}bg-success{% else %}bg-danger{% endif %}">
+                                                {% if sc_growth >= 0 %}+{% endif %}{{ '{:.1f}'.format(sc_growth) }}%
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    {% set phc_change = comparison.infra.phc_2023 - comparison.infra.phc_2005 %}
+                                    {% set phc_growth = ((phc_change / comparison.infra.phc_2005) * 100) if comparison.infra.phc_2005 > 0 else 0 %}
+                                    <tr>
+                                        <td><i class="fa fa-hospital-o text-success me-2"></i>PHCs</td>
+                                        <td class="text-center">{{ '{:,}'.format(comparison.infra.phc_2005) }}</td>
+                                        <td class="text-center">{{ '{:,}'.format(comparison.infra.phc_2023) }}</td>
+                                        <td class="text-center {% if phc_change >= 0 %}text-success{% else %}text-danger{% endif %}">
+                                            {% if phc_change >= 0 %}+{% endif %}{{ '{:,}'.format(phc_change) }}
+                                        </td>
+                                        <td class="text-center">
+                                            <span class="badge {% if phc_growth >= 0 %}bg-success{% else %}bg-danger{% endif %}">
+                                                {% if phc_growth >= 0 %}+{% endif %}{{ '{:.1f}'.format(phc_growth) }}%
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    {% set chc_change = comparison.infra.chc_2023 - comparison.infra.chc_2005 %}
+                                    {% set chc_growth = ((chc_change / comparison.infra.chc_2005) * 100) if comparison.infra.chc_2005 > 0 else 0 %}
+                                    <tr>
+                                        <td><i class="fa fa-plus-square text-info me-2"></i>CHCs</td>
+                                        <td class="text-center">{{ '{:,}'.format(comparison.infra.chc_2005) }}</td>
+                                        <td class="text-center">{{ '{:,}'.format(comparison.infra.chc_2023) }}</td>
+                                        <td class="text-center {% if chc_change >= 0 %}text-success{% else %}text-danger{% endif %}">
+                                            {% if chc_change >= 0 %}+{% endif %}{{ '{:,}'.format(chc_change) }}
+                                        </td>
+                                        <td class="text-center">
+                                            <span class="badge {% if chc_growth >= 0 %}bg-success{% else %}bg-danger{% endif %}">
+                                                {% if chc_growth >= 0 %}+{% endif %}{{ '{:.1f}'.format(chc_growth) }}%
+                                            </span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <div class="chart-container mt-4" style="height: 300px;">
+                            <canvas id="comparisonChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="alert alert-info">
+            <i class="fa fa-info-circle me-2"></i>
+            Comparison data not available for this state.
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/state_view.js') }}"></script>
+<script>
+    const stateStats = {
+        sub_centres_rural: {{ state_stats.get('sub_centres_rural', 0) }},
+        sub_centres_urban: {{ state_stats.get('sub_centres_urban', 0) }},
+        phcs_rural: {{ state_stats.get('phcs_rural', 0) }},
+        phcs_urban: {{ state_stats.get('phcs_urban', 0) }},
+        chcs_rural: {{ state_stats.get('chcs_rural', 0) }},
+        chcs_urban: {{ state_stats.get('chcs_urban', 0) }},
+        population_rural: {{ state_stats.get('population_rural', 0) }},
+        population_urban: {{ state_stats.get('population_urban', 0) }},
+        birth_rate: {{ state_stats.get('birth_rate', 0) }},
+        death_rate: {{ state_stats.get('death_rate', 0) }}
+    };
+    
+    {% if comparison %}
+    const comparisonData = {
+        sc_2005: {{ comparison.infra.sc_2005 }},
+        sc_2023: {{ comparison.infra.sc_2023 }},
+        phc_2005: {{ comparison.infra.phc_2005 }},
+        phc_2023: {{ comparison.infra.phc_2023 }},
+        chc_2005: {{ comparison.infra.chc_2005 }},
+        chc_2023: {{ comparison.infra.chc_2023 }}
+    };
+    {% else %}
+    const comparisonData = null;
+    {% endif %}
+    
+    $(document).ready(function() {
+        ShowStateView(stateStats, comparisonData);
+    });
+</script>
+{% endblock %}
