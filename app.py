@@ -16,7 +16,10 @@ def health_indicators():
     
     if 'birth_death_rate' in dataframes and not dataframes['birth_death_rate'].empty:
         indicators['birth_death'] = dataframes['birth_death_rate'].to_dict('records')
-        
+
+    if 'state_density' in dataframes and not dataframes['state_density'].empty:
+        indicators['density'] = dataframes['state_density'].to_dict('records')
+
     return render_template('health_indicators.html',
                           indicators=json.dumps(indicators))
 
