@@ -41,3 +41,32 @@ def get_comparison_data(dataframes):
         }
     
     return data
+
+def get_yearly_comparison(dataframes):
+    data = {}
+    
+    # Functional infra comparison
+    if 'function_sc_phc_chc_rural' in dataframes and not dataframes['function_sc_phc_chc_rural'].empty:
+        df = dataframes['function_sc_phc_chc_rural']
+        data['function_2022_2023'] = {
+            'labels': df['State/UT'].tolist(),
+            'sc_2022': df['Sub Centre March 2022'].tolist(),
+            'sc_2023': df['Sub Centre March 2023'].tolist(),
+            'phc_2022': df['PHCs March 2022'].tolist(),
+            'phc_2023': df['PHCs March 2023'].tolist(),
+            'chc_2022': df['CHCs March 2022'].tolist(),
+            'chc_2023': df['CHCs March 2023'].tolist(),
+        }
+    
+    # Manpower comparison
+    if 'manpower_part1' in dataframes and not dataframes['manpower_part1'].empty:
+        df = dataframes['manpower_part1']
+        data['manpower_2022_2023'] = {
+            'labels': df['State/UT'].tolist(),
+            'doctors_2022': df['Doctors/Medical Officers at PHC March 2022'].tolist(),
+            'doctors_2023': df['Doctors/Medical Officers at PHC March 2023'].tolist(),
+            'specialists_2022': df['Total Specialists at CHC March 2022'].tolist(),
+            'specialists_2023': df['Total Specialists at CHC March 2023'].tolist(),
+        }
+    
+    return data 
