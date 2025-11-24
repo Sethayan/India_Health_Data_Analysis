@@ -202,65 +202,136 @@ function initializeManPowerStats(manpowerData) {
             `);
         });
 
-           if (manpowerData.nursing) {
+        if (manpowerData.nursing) {
 
-        const nursing = manpowerData.nursing;
-        let totalRequired = 0, totalPosition = 0, totalVacant = 0;
+            const nursing = manpowerData.nursing;
+            let totalRequired = 0, totalPosition = 0, totalVacant = 0;
 
-        nursing.forEach(n => {
-            totalRequired += n['Required 2023'] || 0;
-            totalPosition += n['In Position 2023'] || 0;
-            totalVacant += n['Vacant 2023'] || 0;
-        });
+            nursing.forEach(n => {
+                totalRequired += n['Required 2023'] || 0;
+                totalPosition += n['In Position 2023'] || 0;
+                totalVacant += n['Vacant 2023'] || 0;
+            });
 
-        $('#nursingRequired').text(totalRequired);
-        $('#nursingPosition').text(totalPosition);
-        $('#nursingVacant').text(totalVacant);
+            $('#nursingRequired').text(totalRequired);
+            $('#nursingPosition').text(totalPosition);
+            $('#nursingVacant').text(totalVacant);
 
-        const ctxNursing = document.getElementById('nursingChart');
-        if (ctxNursing) {
-            new Chart(ctxNursing, {
-                type: 'bar',
-                data: {
-                    labels: nursing.map(n => truncateLabel(n['State/UT'], 10)),
-                    datasets: [{
-                        label: 'In Position 2023',
-                        data: nursing.map(n => n['In Position 2023']),
-                        backgroundColor:'rgba(13, 202, 240, 0.8)' ,
-                        borderRadius: 4
-                    }]
-                },
-                options: {
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'top',
-                            labels: {
-                                usePointStyle: true,
-                                padding: 15,
-                                font: { family: "'Inter', sans-serif", size: 12 }
+            const ctxNursing = document.getElementById('nursingChart');
+            if (ctxNursing) {
+                new Chart(ctxNursing, {
+                    type: 'bar',
+                    data: {
+                        labels: nursing.map(n => truncateLabel(n['State/UT'], 10)),
+                        datasets: [{
+                            label: 'In Position 2023',
+                            data: nursing.map(n => n['In Position 2023']),
+                            backgroundColor: 'rgba(13, 202, 240, 0.8)',
+                            borderRadius: 4
+                        }]
+                    },
+                    options: {
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                                labels: {
+                                    usePointStyle: true,
+                                    padding: 15,
+                                    font: { family: "'Inter', sans-serif", size: 12 }
+                                }
+                            },
+                            tooltip: {
+                                backgroundColor: 'rgba(0,0,0,0.8)',
+                                titleFont: { family: "'Inter', sans-serif", size: 13 },
+                                bodyFont: { family: "'Inter', sans-serif", size: 12 },
+                                padding: 12,
+                                cornerRadius: 8
                             }
                         },
-                        tooltip: {
-                            backgroundColor: 'rgba(0,0,0,0.8)',
-                            titleFont: { family: "'Inter', sans-serif", size: 13 },
-                            bodyFont: { family: "'Inter', sans-serif", size: 12 },
-                            padding: 12,
-                            cornerRadius: 8
+                        scales: {
+                            x: { ticks: { font: { size: 11 } }, grid: { display: false } },
+                            y: { grid: { color: 'rgba(0,0,0,0.05)' } }
                         }
-                    },
-                    scales: {
-                        x: { ticks: { font: { size: 11 }}, grid: { display: false }},
-                        y: { grid: { color: 'rgba(0,0,0,0.05)' } }
                     }
-                }
-            });
-        }
+                });
+            }
 
-        const nursingBody = $('#nursingTableBody');
-        nursingBody.empty();
-        nursing.forEach(n => {
-            nursingBody.append(`
+            if (manpowerData.pharmacists) {
+
+                const pharma = manpowerData.pharmacists;
+                let totalRequired = 0, totalPosition = 0, totalVacant = 0;
+
+                pharma.forEach(p => {
+                    totalRequired += p['Required 2023'] || 0;
+                    totalPosition += p['In Position 2023'] || 0;
+                    totalVacant += p['Vacant 2023'] || 0;
+                });
+
+                $('#pharmacistsRequired').text(totalRequired);
+                $('#pharmacistsPosition').text(totalPosition);
+                $('#pharmacistsVacant').text(totalVacant);
+
+                const ctxPharma = document.getElementById('pharmacistsChart');
+                if (ctxPharma) {
+                    new Chart(ctxPharma, {
+                        type: 'bar',
+                        data: {
+                            labels: pharma.map(p => truncateLabel(p['State/UT'], 10)),
+                            datasets: [{
+                                label: 'In Position 2023',
+                                data: pharma.map(p => p['In Position 2023']),
+                                backgroundColor: 'rgba(255, 193, 7, 0.8)',
+                                borderRadius: 4
+                            }]
+                        },
+                        options: {
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    position: 'top',
+                                    labels: {
+                                        usePointStyle: true,
+                                        padding: 15,
+                                        font: { family: "'Inter', sans-serif", size: 12 }
+                                    }
+                                },
+                                tooltip: {
+                                    backgroundColor: 'rgba(0,0,0,0.8)',
+                                    titleFont: { family: "'Inter', sans-serif", size: 13 },
+                                    bodyFont: { family: "'Inter', sans-serif", size: 12 },
+                                    padding: 12,
+                                    cornerRadius: 8
+                                }
+                            },
+                            scales: {
+                                x: { ticks: { font: { size: 11 } }, grid: { display: false } },
+                                y: { grid: { color: 'rgba(0,0,0,0.05)' } }
+                            }
+                        }
+                    });
+                }
+
+                const pharmaBody = $('#pharmacistsTableBody');
+                pharmaBody.empty();
+                pharma.forEach(p => {
+                    pharmaBody.append(`
+                <tr>
+                    <td>${p['State/UT']}</td>
+                    <td class="text-center">${(p['Required 2023'] || 0)}</td>
+                    <td class="text-center">${(p['Sanctioned 2023'] || 0)}</td>
+                    <td class="text-center">${(p['In Position 2023'] || 0)}</td>
+                    <td class="text-center text-danger">${(p['Vacant 2023'] || 0)}</td>
+                    <td class="text-center text-warning">${(p['Shortfall 2023'] || 0)}</td>
+                </tr>
+            `);
+                });
+            }
+
+            const nursingBody = $('#nursingTableBody');
+            nursingBody.empty();
+            nursing.forEach(n => {
+                nursingBody.append(`
                 <tr>
                     <td>${n['State/UT']}</td>
                     <td class="text-center">${(n['Required 2023'] || 0)}</td>
@@ -270,8 +341,8 @@ function initializeManPowerStats(manpowerData) {
                     <td class="text-center text-warning">${(n['Shortfall 2023'] || 0)}</td>
                 </tr>
             `);
-        });
-    }
+            });
+        }
     }
 }
 
