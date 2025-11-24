@@ -1,38 +1,38 @@
-import pandas as pd
+from database import get_db, models
 
-def get_district_data(dataframes,state_name=None):
-    if 'district_wise_infra' not in dataframes or dataframes['district_wise_infra'].empty:
-        return {'states': [], 'districts': []}
+def get_district_data(state_name=None):
+    db = get_db()
     
-    df = dataframes['district_wise_infra'].copy()
-    
-    df.columns = [col.replace('\n', ' ').replace('\r', '').strip() for col in df.columns]
-    
-    state_col = 'States/Union Territory'
-    district_col = 'Name of the District'
-    
-    df[state_col] = df[state_col].str.replace('\n', ' ').str.replace('\r', '').str.strip()
-    df[state_col] = df[state_col].str.replace(r'\s+', ' ', regex=True)
-    
-    states = sorted(df[state_col].unique().tolist())
-    
-    if state_name:
-        df = df[df[state_col] == state_name]
-    
-    districts = []
-    for _, row in df.iterrows():
-        districts.append({
-            'state': row[state_col],
-            'district': row[district_col],
-            'sc_rural': int(row['Sub Centres Rural']) if pd.notna(row['Sub Centres Rural']) else 0,
-            'sc_urban': int(row['Sub Centres Urban']) if pd.notna(row['Sub Centres Urban']) else 0,
-            'phc_rural': int(row['PHCs Rural']) if pd.notna(row['PHCs Rural']) else 0,
-            'phc_urban': int(row['PHCs Urban']) if pd.notna(row['PHCs Urban']) else 0,
-            'chc_rural': int(row['CHCs Rural']) if pd.notna(row['CHCs Rural']) else 0,
-            'chc_urban': int(row['CHCs Urban']) if pd.notna(row['CHCs Urban']) else 0,
-            'sdh': int(row['Sub Divisional Hospital']) if pd.notna(row['Sub Divisional Hospital']) else 0,
-            'dh': int(row['District Hospital']) if pd.notna(row['District Hospital']) else 0,
-            'mc': int(row['Medical College']) if pd.notna(row['Medical College']) else 0,
-        })
-    
-    return {'states': states, 'districts': districts}
+    try:
+        states_query = db.query(models.DistrictWiseInfra.state_ut).distinct().all()
+        states = sorted([state[0] for state in states_query])
+        
+        if state_name:
+            district_data = db.query(models.DistrictWiseInfra).filter(
+                models.DistrictWiseInfra.state_ut == state_name
+            ).all()
+        else:
+            district_data = db.query(models.DistrictWiseInfra).all()
+        
+        districts = []
+        for row in district_data:
+            districts.append({
+                'state': row.state_ut,
+                'district': row.district_name,
+                'sc_rural': row.sub_centres_rural,
+                'sc_urban': row.sub_centres_urban,
+                'phc_rural': row.phcs_rural,
+                'phc_urban': row.phcs_urban,
+                'chc_rural': row.chcs_rural,
+                'chc_urban': row.chcs_urban,
+                'sdh': row.sub_divisional_hospital,
+                'dh': row.district_hospital,
+                'mc': row.medical_college
+            })
+        
+        return {
+            'states': states,
+            'districts': districts
+        }
+    finally:
+        db.close()

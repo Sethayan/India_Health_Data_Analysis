@@ -4,7 +4,6 @@ import pandas as pd
 DATA_DIRECTORY = os.path.join(os.path.dirname(__file__), 'data')
 
 def load_all_data():
-    """Load all data"""
     dataframes = {}
 
     csv_files = {

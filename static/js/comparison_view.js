@@ -63,7 +63,6 @@ function initComparisonCharts(comparisonData, yearlyData) {
             });
         }
 
-        // PHC Comparison Chart
         const phcCtx = document.getElementById('phcComparisonChart');
         if (phcCtx) {
             new Chart(phcCtx, {
@@ -216,7 +215,6 @@ function initComparisonCharts(comparisonData, yearlyData) {
         }
     }
 
-    // Doctors Comparison Chart
     if (comparisonData && comparisonData.doctors_comparison) {
         const doctors = comparisonData.doctors_comparison;
         const docCtx = document.getElementById('doctorsComparisonChart');

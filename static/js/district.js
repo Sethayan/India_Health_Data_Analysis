@@ -15,7 +15,7 @@ function ViewDistrictData(allDistricts) {
     function renderTable() {
         const start = (currentPage - 1) * itemsPerPage;
         const end = start + itemsPerPage;
-        const pageData = filteredData.slice(start, end); // for pagination this is used. 
+        const pageData = filteredData.slice(start, end); // for pagination we have used this. 
 
         const tbody = $('#districtTableBody');
         tbody.empty();
@@ -106,14 +106,16 @@ function ViewDistrictData(allDistricts) {
         const stateData = {};
         filteredData.forEach(d => {
             if (!stateData[d.state]) {
-                stateData[d.state] = { phc: 0, chc: 0, dh: 0 };
+                stateData[d.state] = { phc: 0, chc: 0, dh: 0, sc: 0 };
             }
             stateData[d.state].phc += d.phc_rural + d.phc_urban;
             stateData[d.state].chc += d.chc_rural + d.chc_urban;
+            stateData[d.state].sc += d.sc_rural + d.sc_urban;
             stateData[d.state].dh += d.dh;
         });
 
         const labels = Object.keys(stateData).slice(0, 15);
+        const scData = labels.map(s => stateData[s].sc)
         const phcData = labels.map(s => stateData[s].phc);
         const chcData = labels.map(s => stateData[s].chc);
 
@@ -127,6 +129,12 @@ function ViewDistrictData(allDistricts) {
                 data: {
                     labels: labels.map(l => truncateLabel(l, 12)),
                     datasets: [
+                        {
+                            label: 'Total SCs',
+                            data: scData,
+                            backgroundColor: 'rgba(197, 49, 19, 0.8)',
+                            borderRadius: 4
+                        },
                         {
                             label: 'Total PHCs',
                             data: phcData,

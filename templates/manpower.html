@@ -340,8 +340,6 @@
         </div>
     </div>
 </div>
-
-
 {% endblock %}
 
 {% block extra_js %}
@@ -352,7 +350,6 @@
     $(document).ready(function () {
         initializeManPowerStats(manpowerData);
 
-        // Search functionality
         $('#doctorsSearch').on('keyup', function () {
             const value = $(this).val().toLowerCase();
             $('#doctorsTableBody tr').filter(function () {

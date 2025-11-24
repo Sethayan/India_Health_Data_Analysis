@@ -1,71 +1,138 @@
-import pandas as pd
+from database import get_db, models
 
-def get_comparison_data(dataframes):
-    data = {}
-
-    if 'function_infra_rural' in dataframes and not dataframes['function_infra_rural'].empty:
-        df = dataframes['function_infra_rural']
-        data['infra_comparison'] = {
-            'labels': df['State/UT'].tolist(),
-            'sc_2005': df['Sub Centre 2005'].tolist(),
-            'sc_2023': df['Sub Centre 2023'].tolist(),
-            'phc_2005': df['PHCs 2005'].tolist(),
-            'phc_2023': df['PHCs 2023'].tolist(),
-            'chc_2005': df['CHCs 2005'].tolist(),
-            'chc_2023': df['CHCs 2023'].tolist()
-        }
-    
-    
-    if 'mo_phc_rural' in dataframes and not dataframes['mo_phc_rural'].empty:
-        df = dataframes['mo_phc_rural'].copy()
-        df['In Position 2005'] = pd.to_numeric(df['In Position 2005'])
-        df['In Position 2023'] = pd.to_numeric(df['In Position 2023'])
-        data['doctors_comparison'] = {
-            'labels': df['State/UT'].tolist(),
-            'position_2005': df['In Position 2005'].tolist(),
-            'position_2023': df['In Position 2023'].tolist(),
-            'required_2005': df['Required 2005'].tolist(),
-            'required_2023': df['Required 2023'].tolist(),
-        }
-    
-    
-    if 'specialist_chc_rural' in dataframes and not dataframes['specialist_chc_rural'].empty:
-        df = dataframes['specialist_chc_rural'].copy()
-        df['In Position 2005'] = pd.to_numeric(df['In Position 2005'])
-        df['In Position 2023'] = pd.to_numeric(df['In Position 2023'])
-        data['specialists_comparison'] = {
-            'labels': df['State/UT'].tolist(),
-            'position_2005': df['In Position 2005'].tolist(),
-            'position_2023': df['In Position 2023'].tolist(),
-        }
-    
-    return data
-
-def get_yearly_comparison(dataframes):
+def get_comparison_data():
+    db = get_db()
     data = {}
     
-    
-    if 'function_sc_phc_chc_rural' in dataframes and not dataframes['function_sc_phc_chc_rural'].empty:
-        df = dataframes['function_sc_phc_chc_rural']
-        data['function_2022_2023'] = {
-            'labels': df['State/UT'].tolist(),
-            'sc_2022': df['Sub Centre March 2022'].tolist(),
-            'sc_2023': df['Sub Centre March 2023'].tolist(),
-            'phc_2022': df['PHCs March 2022'].tolist(),
-            'phc_2023': df['PHCs March 2023'].tolist(),
-            'chc_2022': df['CHCs March 2022'].tolist(),
-            'chc_2023': df['CHCs March 2023'].tolist(),
-        }
-    
-    
-    if 'manpower_part1' in dataframes and not dataframes['manpower_part1'].empty:
-        df = dataframes['manpower_part1']
-        data['manpower_2022_2023'] = {
-            'labels': df['State/UT'].tolist(),
-            'doctors_2022': df['Doctors/Medical Officers at PHC March 2022'].tolist(),
-            'doctors_2023': df['Doctors/Medical Officers at PHC March 2023'].tolist(),
-            'specialists_2022': df['Total Specialists at CHC March 2022'].tolist(),
-            'specialists_2023': df['Total Specialists at CHC March 2023'].tolist(),
-        }
-    
-    return data 
+    try:
+        infra_data = db.query(models.FunctionInfraRural).all()
+        if infra_data:
+            labels = []
+            sc_2005 = []
+            sc_2023 = []
+            phc_2005 = []
+            phc_2023 = []
+            chc_2005 = []
+            chc_2023 = []
+            
+            for state in infra_data:
+                labels.append(state.state_ut)
+                sc_2005.append(state.sub_centre_2005)
+                sc_2023.append(state.sub_centre_2023)
+                phc_2005.append(state.phcs_2005)
+                phc_2023.append(state.phcs_2023)
+                chc_2005.append(state.chcs_2005)
+                chc_2023.append(state.chcs_2023)
+            
+            data['infra_comparison'] = {
+                'labels': labels,
+                'sc_2005': sc_2005,
+                'sc_2023': sc_2023,
+                'phc_2005': phc_2005,
+                'phc_2023': phc_2023,
+                'chc_2005': chc_2005,
+                'chc_2023': chc_2023
+            }
+        
+        doctors_data = db.query(models.MOPHCRural).all()
+        if doctors_data:
+            labels = []
+            position_2005 = []
+            position_2023 = []
+            required_2005 = []
+            required_2023 = []
+            
+            for state in doctors_data:
+                labels.append(state.state_ut)
+                position_2005.append(state.in_position_2005)
+                position_2023.append(state.in_position_2023)
+                required_2005.append(state.required_2005)
+                required_2023.append(state.required_2023)
+            
+            data['doctors_comparison'] = {
+                'labels': labels,
+                'position_2005': position_2005,
+                'position_2023': position_2023,
+                'required_2005': required_2005,
+                'required_2023': required_2023,
+            }
+        
+        specialists_data = db.query(models.SpecialistCHCRural).all()
+        if specialists_data:
+            labels = []
+            position_2005 = []
+            position_2023 = []
+            
+            for state in specialists_data:
+                labels.append(state.state_ut)
+                position_2005.append(state.in_position_2005)
+                position_2023.append(state.in_position_2023)
+            
+            data['specialists_comparison'] = {
+                'labels': labels,
+                'position_2005': position_2005,
+                'position_2023': position_2023,
+            }
+        return data
+    finally:
+        db.close()
+
+
+def get_yearly_comparison():
+    db = get_db()
+    data = {}
+    try:
+        function_data = db.query(models.FunctionSCPHCCHCRural).all()
+        if function_data:
+            labels = []
+            sc_2022 = []
+            sc_2023 = []
+            phc_2022 = []
+            phc_2023 = []
+            chc_2022 = []
+            chc_2023 = []
+            
+            for state in function_data:
+                labels.append(state.state_ut)
+                sc_2022.append(state.sub_centre_march_2022)
+                sc_2023.append(state.sub_centre_march_2023)
+                phc_2022.append(state.phcs_march_2022)
+                phc_2023.append(state.phcs_march_2023)
+                chc_2022.append(state.chcs_march_2022)
+                chc_2023.append(state.chcs_march_2023)
+            
+            data['function_2022_2023'] = {
+                'labels': labels,
+                'sc_2022': sc_2022,
+                'sc_2023': sc_2023,
+                'phc_2022': phc_2022,
+                'phc_2023': phc_2023,
+                'chc_2022': chc_2022,
+                'chc_2023': chc_2023,
+            }
+        
+        manpower_data = db.query(models.ManpowerPart1).all()
+        if manpower_data:
+            labels = []
+            doctors_2022 = []
+            doctors_2023 = []
+            specialists_2022 = []
+            specialists_2023 = []
+            
+            for state in manpower_data:
+                labels.append(state.state_ut)
+                doctors_2022.append(state.doctors_phc_march_2022)
+                doctors_2023.append(state.doctors_phc_march_2023)
+                specialists_2022.append(state.specialists_chc_march_2022)
+                specialists_2023.append(state.specialists_chc_march_2023)
+            
+            data['manpower_2022_2023'] = {
+                'labels': labels,
+                'doctors_2022': doctors_2022,
+                'doctors_2023': doctors_2023,
+                'specialists_2022': specialists_2022,
+                'specialists_2023': specialists_2023,
+            }
+        return data
+    finally:
+        db.close()

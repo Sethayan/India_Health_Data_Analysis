@@ -1,78 +1,118 @@
-def get_state_stats(state_name,dataframes):
+from database import get_db, models
 
+def get_state_stats(state_name):
+    db = get_db()
     stats = {'state_name': state_name}
     
-    df = dataframes['sc_phc_chc_count']
-    state_data = df[df['State/UT'] == state_name]
-    if not state_data.empty:
-        row = state_data.iloc[0]
-        stats['sub_centres_rural'] = int(row['Sub centres Rural'])
-        stats['sub_centres_urban'] = int(row['Sub centres Urban'])
-        stats['phcs_rural'] = int(row['PHCs Rural'])
-        stats['phcs_urban'] = int(row['PHCs Urban'])
-        stats['chcs_rural'] = int(row['CHCs Rural'])
-        stats['chcs_urban'] = int(row['CHCs Urban'])
-        stats['total_sub_centres'] = stats['sub_centres_rural'] + stats['sub_centres_urban']
-        stats['total_phcs'] = stats['phcs_rural'] + stats['phcs_urban']
-        stats['total_chcs'] = stats['chcs_rural'] + stats['chcs_urban']
-
-    df = dataframes['sdh_dh_mc_count']
-    state_data = df[df['State/UT'] == state_name]
-    if not state_data.empty:
-        row = state_data.iloc[0]
-        stats['sdh'] = int(row['Sub Divisional Hospital (SDH)'])
-        stats['dh'] = int(row['District Hospital (DH)'])
-        stats['medical_colleges'] = int(row['Medical Colleges'])
-    
-    df = dataframes['state_population']
-    state_data = df[df['State/UT'] == state_name]
-    if not state_data.empty:
-        row = state_data.iloc[0]
-        stats['population_2023'] = int(row['Estimated Population 2023 Total'])
-        stats['population_rural'] = int(row['Estimated Population 2023 Rural'])
-        stats['population_urban'] = int(row['Estimated Population 2023 Urban'])
-        stats['rural_percentage'] = float(row['Estimated Population 2023 Rural %'])
+    try:
+        infra = db.query(models.StateWiseSCPHCCHCCount).filter(
+            models.StateWiseSCPHCCHCCount.state_ut == state_name
+        ).first()
+        if infra:
+            stats['sub_centres_rural'] = infra.sub_centres_rural
+            stats['sub_centres_urban'] = infra.sub_centres_urban
+            stats['phcs_rural'] = infra.phcs_rural
+            stats['phcs_urban'] = infra.phcs_urban
+            stats['chcs_rural'] = infra.chcs_rural
+            stats['chcs_urban'] = infra.chcs_urban
+            stats['total_sub_centres'] = stats['sub_centres_rural'] + stats['sub_centres_urban']
+            stats['total_phcs'] = stats['phcs_rural'] + stats['phcs_urban']
+            stats['total_chcs'] = stats['chcs_rural'] + stats['chcs_urban']
         
-    df = dataframes['state_area']
-    state_data = df[df['State/UT'] == state_name]
-    if not state_data.empty:
-        row = state_data.iloc[0]
-        stats['total_area'] = float(row['Total Area (Sq. Km.)'])
-        stats['rural_area'] = float(row['Rural Area (Sq. Km.)'])
-        stats['districts'] = int(row['Number of Districts'])
-        stats['villages'] = int(row['Number of Villages'])
+        hospitals = db.query(models.StateWiseSDHDHMCCount).filter(
+            models.StateWiseSDHDHMCCount.state_ut == state_name
+        ).first()
+        if hospitals:
+            stats['sdh'] = hospitals.sub_divisional_hospital
+            stats['dh'] = hospitals.district_hospital
+            stats['medical_colleges'] = hospitals.medical_colleges
+        
+        population = db.query(models.StatePopulation).filter(
+            models.StatePopulation.state_ut == state_name
+        ).first()
+        if population:
+            stats['population_2023'] = population.pop_2023_total
+            stats['population_rural'] = population.pop_2023_rural
+            stats['population_urban'] = population.pop_2023_urban
+            stats['rural_percentage'] = population.pop_2023_rural_pct
+        
+        area = db.query(models.StateArea).filter(
+            models.StateArea.state_ut == state_name
+        ).first()
+        if area:
+            stats['total_area'] = area.total_area_sq_km
+            stats['rural_area'] = area.rural_area_sq_km
+            stats['districts'] = area.number_of_districts
+            stats['villages'] = area.number_of_villages
+        
+        density = db.query(models.StateDensity).filter(
+            models.StateDensity.state_ut == state_name
+        ).first()
+        if density:
+            stats['density_total'] = density.density_total
+            stats['density_rural'] = density.density_rural
+            stats['density_urban'] = density.density_urban
+        
+        imr = db.query(models.IMR).filter(
+            models.IMR.state_ut == state_name
+        ).first()
+        
+        if imr:
+            stats['imr_total'] = imr.imr_total
+            stats['imr_rural'] = imr.imr_rural
+            stats['imr_urban'] = imr.imr_urban
+        
+        bd_rate = db.query(models.BirthDeathRate).filter(
+            models.BirthDeathRate.state_ut == state_name
+        ).first()
+        if bd_rate:
+            stats['birth_rate'] = bd_rate.birth_rate_total
+            stats['death_rate'] = bd_rate.death_rate_total
+            stats['birth_rate_rural'] = bd_rate.birth_rate_rural
+            stats['death_rate_rural'] = bd_rate.death_rate_rural
+        
+        shortfall = db.query(models.Shortfall).filter(
+            models.Shortfall.state_ut == state_name
+        ).first()
+        if shortfall:
+            stats['sc_shortfall_pct'] = shortfall.sc_shortfall_pct
+            stats['phc_shortfall_pct'] = shortfall.phc_shortfall_pct
+            stats['chc_shortfall_pct'] = shortfall.chc_shortfall_pct
+        
+        return stats
+    finally:
+        db.close()
+
+def get_state_comparison_data(state_name):
+    db = get_db()
+    comparison = {}
     
-    df = dataframes['state_density']
-    state_data = df[df['State/UT'] == state_name]
-    if not state_data.empty:
-        row = state_data.iloc[0]
-        stats['density_total'] = int(row['Population Density Total'])
-        stats['density_rural'] = int(row['Population Density Rural'])
-        stats['density_urban'] = int(row['Population Density Urban'])
-    
-    df = dataframes['imr']
-    state_data = df[df['State/UT'] == state_name]
-    if not state_data.empty:
-        row = state_data.iloc[0]
-        stats['imr_total'] = int(row['IMR Total'])
-        stats['imr_rural'] = int(row['IMR Rural'])
-        stats['imr_urban'] = int(row['IMR Urban'])    
-    
-    df = dataframes['birth_death_rate']
-    state_data = df[df['State/UT'] == state_name]
-    if not state_data.empty:
-        row = state_data.iloc[0]
-        stats['birth_rate'] = float(row['Birth Rate Total'])
-        stats['death_rate'] = float(row['Death Rate Total'])
-        stats['birth_rate_rural'] = float(row['Birth Rate Rural'])
-        stats['death_rate_rural'] = float(row['Death Rate Rural'])
-    
-    df = dataframes['shortfall']
-    state_data = df[df['State/UT'] == state_name]
-    if not state_data.empty:
-        row = state_data.iloc[0]
-        stats['sc_shortfall_pct'] = row['Sub Centres % Shortfall'] 
-        stats['phc_shortfall_pct'] = row['PHCs % Shortfall'] 
-        stats['chc_shortfall_pct'] = row['CHCs % Shortfall']
-    
-    return stats
+    try:
+        infra = db.query(models.FunctionInfraRural).filter(
+            models.FunctionInfraRural.state_ut == state_name
+        ).first()
+        if infra:
+            comparison['infra'] = {
+                'sc_2005': infra.sub_centre_2005,
+                'sc_2023': infra.sub_centre_2023,
+                'phc_2005': infra.phcs_2005,
+                'phc_2023': infra.phcs_2023,
+                'chc_2005': infra.chcs_2005,
+                'chc_2023': infra.chcs_2023,
+            }
+        
+        return comparison
+    finally:
+        db.close()
+
+def get_state_list_data():
+    db = get_db()
+    try:
+        states = db.query(models.StateWiseSCPHCCHCCount.state_ut).all()
+        state_list = []
+        for state in states:
+            state_list.append(state[0])
+        
+        return state_list
+    finally:
+        db.close()

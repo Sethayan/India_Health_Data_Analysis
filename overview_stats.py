@@ -1,223 +1,317 @@
-import pandas as pd
+from database import get_db, models
+from sqlalchemy import func
 
-def get_national_stats(dataframes):
+def get_national_stats():
+    db = get_db()
     stats = {}
     
-    if 'state_population' in dataframes and not dataframes['state_population'].empty:
-        df = dataframes['state_population']
-        stats['total_population_2023'] = int(df['Estimated Population 2023 Total'].sum())
-        stats['rural_population_2023'] = int(df['Estimated Population 2023 Rural'].sum())
-        stats['urban_population_2023'] = int(df['Estimated Population 2023 Urban'].sum())
-        stats['rural_percentage'] = round(stats['rural_population_2023'] / stats['total_population_2023'] * 100, 1)
-
-    if 'sc_phc_chc_count' in dataframes and not dataframes['sc_phc_chc_count'].empty:
-        df = dataframes['sc_phc_chc_count']
-        stats['total_phcs'] = int(df['PHCs Rural'].sum() + df['PHCs Urban'].sum())
-        stats['rural_phcs'] = int(df['PHCs Rural'].sum())
-        stats['urban_phcs'] = int(df['PHCs Urban'].sum())
+    try:
+        pop_data = db.query(
+            func.sum(models.StatePopulation.pop_2023_total).label('total'),
+            func.sum(models.StatePopulation.pop_2023_rural).label('rural'),
+            func.sum(models.StatePopulation.pop_2023_urban).label('urban')
+        ).first()
         
-        stats['total_chcs'] = int(df['CHCs Rural'].sum() + df['CHCs Urban'].sum())
-        stats['rural_chcs'] = int(df['CHCs Rural'].sum())
-        stats['urban_chcs'] = int(df['CHCs Urban'].sum())
-
-        stats['total_sub_centres'] = int(df['Sub centres Rural'].sum() + df['Sub centres Urban'].sum())
-        stats['rural_sub_centres'] = int(df['Sub centres Rural'].sum())
-        stats['urban_sub_centres'] = int(df['Sub centres Urban'].sum())
-    
-    if 'imr' in dataframes and not dataframes['imr'].empty:
-        df = dataframes['imr']
-        stats['avg_imr'] = round(df['IMR Total'].mean(), 1)
-        stats['avg_imr_rural'] = round(df['IMR Rural'].mean(), 1)
-        stats['avg_imr_urban'] = round(df['IMR Urban'].mean(), 1)
-
-    if 'sdh_dh_mc_count' in dataframes and not dataframes['sdh_dh_mc_count'].empty:
-        df = dataframes['sdh_dh_mc_count']
-        stats['total_dh'] = int(df['District Hospital (DH)'].sum())
-        stats['total_sdh'] = int(df['Sub Divisional Hospital (SDH)'].sum())
-        stats['total_medical_colleges'] = int(df['Medical Colleges'].sum())
-
-    if 'mo_phc_rural' in dataframes and not dataframes['mo_phc_rural'].empty:
-        df = dataframes['mo_phc_rural']
-        stats['total_doctors_required_2023'] = int(df['Required 2023'].sum())
-        stats['total_doctors_position_2023'] = int(df['In Position 2023'].sum())
-        stats['total_doctors_vacant_2023'] = int(df['Vacant 2023'].sum())
-    
-    if 'specialist_chc_rural' in dataframes and not dataframes['specialist_chc_rural'].empty:
-        df = dataframes['specialist_chc_rural']
-        stats['total_specialists_required_2023'] = int(df['Required 2023'].sum())
-        stats['total_specialists_position_2023'] = int(df['In Position 2023'].sum())
-        stats['total_specialists_vacant_2023'] = int(df['Vacant 2023'].sum())
-
-    if 'birth_death_rate' in dataframes and not dataframes['birth_death_rate'].empty:
-        df = dataframes['birth_death_rate']
-        stats['avg_birth_rate'] = round(df['Birth Rate Total'].mean(), 1)
-        stats['avg_death_rate'] = round(df['Death Rate Total'].mean(), 1)
-    
-    if 'shortfall' in dataframes and not dataframes['shortfall'].empty:
-        df = dataframes['shortfall']
-        stats['avg_sc_shortfall'] = round(df['Sub Centres % Shortfall'].mean(), 1)
-        stats['avg_phc_shortfall'] = round(df['PHCs % Shortfall'].mean(), 1)
-        stats['avg_chc_shortfall'] = round(df['CHCs % Shortfall'].mean(), 1)
+        if pop_data and pop_data.total:
+            stats['total_population_2023'] = int(pop_data.total)
+            stats['rural_population_2023'] = int(pop_data.rural)
+            stats['urban_population_2023'] = int(pop_data.urban)
+            stats['rural_percentage'] = round(stats['rural_population_2023'] / stats['total_population_2023'] * 100, 1)
         
-        stats['total_sc_shortfall'] = int(df['Sub Centres S'].sum())
-        stats['total_phc_shortfall'] = int(df['PHCs S'].sum())
-        stats['total_chc_shortfall'] = int(df['CHCs S'].sum())
+        infra_data = db.query(
+            func.sum(models.StateWiseSCPHCCHCCount.phcs_rural).label('phcs_rural'),
+            func.sum(models.StateWiseSCPHCCHCCount.phcs_urban).label('phcs_urban'),
+            func.sum(models.StateWiseSCPHCCHCCount.chcs_rural).label('chcs_rural'),
+            func.sum(models.StateWiseSCPHCCHCCount.chcs_urban).label('chcs_urban'),
+            func.sum(models.StateWiseSCPHCCHCCount.sub_centres_rural).label('sc_rural'),
+            func.sum(models.StateWiseSCPHCCHCCount.sub_centres_urban).label('sc_urban')
+        ).first()
+        
+        if infra_data:
+            stats['total_phcs'] = int(infra_data.phcs_rural + infra_data.phcs_urban)
+            stats['rural_phcs'] = int(infra_data.phcs_rural)
+            stats['urban_phcs'] = int(infra_data.phcs_urban)
+            
+            stats['total_chcs'] = int(infra_data.chcs_rural + infra_data.chcs_urban)
+            stats['rural_chcs'] = int(infra_data.chcs_rural)
+            stats['urban_chcs'] = int(infra_data.chcs_urban)
+            
+            stats['total_sub_centres'] = int(infra_data.sc_rural + infra_data.sc_urban)
+            stats['rural_sub_centres'] = int(infra_data.sc_rural)
+            stats['urban_sub_centres'] = int(infra_data.sc_urban)
+        
+        imr_data = db.query(
+            func.avg(models.IMR.imr_total).label('avg_total'),
+            func.avg(models.IMR.imr_rural).label('avg_rural'),
+            func.avg(models.IMR.imr_urban).label('avg_urban')
+        ).first()
+        
+        if imr_data:
+            stats['avg_imr'] = round(imr_data.avg_total, 1) if imr_data.avg_total else 0
+            stats['avg_imr_rural'] = round(imr_data.avg_rural, 1) if imr_data.avg_rural else 0
+            stats['avg_imr_urban'] = round(imr_data.avg_urban, 1) if imr_data.avg_urban else 0
+        
+        hospital_data = db.query(
+            func.sum(models.StateWiseSDHDHMCCount.district_hospital).label('dh'),
+            func.sum(models.StateWiseSDHDHMCCount.sub_divisional_hospital).label('sdh'),
+            func.sum(models.StateWiseSDHDHMCCount.medical_colleges).label('mc')
+        ).first()
+        
+        if hospital_data:
+            stats['total_dh'] = int(hospital_data.dh)
+            stats['total_sdh'] = int(hospital_data.sdh)
+            stats['total_medical_colleges'] = int(hospital_data.mc)
+        
+        doctors_data = db.query(
+            func.sum(models.MOPHCRural.required_2023).label('required'),
+            func.sum(models.MOPHCRural.in_position_2023).label('position'),
+            func.sum(models.MOPHCRural.vacant_2023).label('vacant')
+        ).first()
+        
+        if doctors_data:
+            stats['total_doctors_required_2023'] = int(doctors_data.required)
+            stats['total_doctors_position_2023'] = int(doctors_data.position)
+            stats['total_doctors_vacant_2023'] = int(doctors_data.vacant)
+        
+        specialists_data = db.query(
+            func.sum(models.SpecialistCHCRural.required_2023).label('required'),
+            func.sum(models.SpecialistCHCRural.in_position_2023).label('position'),
+            func.sum(models.SpecialistCHCRural.vacant_2023).label('vacant')
+        ).first()
+        
+        if specialists_data:
+            stats['total_specialists_required_2023'] = int(specialists_data.required)
+            stats['total_specialists_position_2023'] = int(specialists_data.position)
+            stats['total_specialists_vacant_2023'] = int(specialists_data.vacant)
+        
+        bd_data = db.query(
+            func.avg(models.BirthDeathRate.birth_rate_total).label('birth'),
+            func.avg(models.BirthDeathRate.death_rate_total).label('death')
+        ).first()
+        
+        if bd_data:
+            stats['avg_birth_rate'] = round(bd_data.birth, 1) if bd_data.birth else 0
+            stats['avg_death_rate'] = round(bd_data.death, 1) if bd_data.death else 0
+        
+        shortfall_data = db.query(
+            func.avg(models.Shortfall.sc_shortfall_pct).label('sc_pct'),
+            func.avg(models.Shortfall.phc_shortfall_pct).label('phc_pct'),
+            func.avg(models.Shortfall.chc_shortfall_pct).label('chc_pct'),
+            func.sum(models.Shortfall.sc_shortfall).label('sc_total'),
+            func.sum(models.Shortfall.phc_shortfall).label('phc_total'),
+            func.sum(models.Shortfall.chc_shortfall).label('chc_total')
+        ).first()
+        if shortfall_data:
+            stats['avg_sc_shortfall'] = round(shortfall_data.sc_pct, 1) if shortfall_data.sc_pct else 0
+            stats['avg_phc_shortfall'] = round(shortfall_data.phc_pct, 1) if shortfall_data.phc_pct else 0
+            stats['avg_chc_shortfall'] = round(shortfall_data.chc_pct, 1) if shortfall_data.chc_pct else 0
+            
+            stats['total_sc_shortfall'] = int(shortfall_data.sc_total) if shortfall_data.sc_total else 0
+            stats['total_phc_shortfall'] = int(shortfall_data.phc_total) if shortfall_data.phc_total else 0
+            stats['total_chc_shortfall'] = int(shortfall_data.chc_total) if shortfall_data.chc_total else 0
+        
+        return stats
+    finally:
+        db.close()
 
-    return stats
 
-def get_insights(dataframes):
+def get_insights():
+    db = get_db()
     insights = []
     
-    if 'shortfall' in dataframes and not dataframes['shortfall'].empty:
-        df = dataframes['shortfall'].copy()
-        df['PHCs % Shortfall'] = pd.to_numeric(df['PHCs % Shortfall'])
-        if not df.empty:
-            max_idx = df['PHCs % Shortfall'].idxmax()
-            if df.loc[max_idx, 'PHCs % Shortfall'] > 0:
-                insights.append({
-                    'type': 'critical',
-                    'icon': 'fa-exclamation-triangle',
-                    'title': 'Highest PHC Shortfall',
-                    'value': f"{df.loc[max_idx, 'PHCs % Shortfall']:.0f}%",
-                    'description': f"{df.loc[max_idx, 'State/UT']} has the highest PHC shortfall at {df.loc[max_idx, 'PHCs % Shortfall']:.0f}%"
-                })
+    try:
+        phc_shortfall = db.query(models.Shortfall).filter(
+            models.Shortfall.phc_shortfall_pct > 0
+        ).order_by(models.Shortfall.phc_shortfall_pct.desc()).first()
         
-        df['CHCs % Shortfall'] = pd.to_numeric(df['CHCs % Shortfall'])
-        if not df.empty:
-            max_idx = df['CHCs % Shortfall'].idxmax()
-            if df.loc[max_idx, 'CHCs % Shortfall'] > 0:
-                insights.append({
-                    'type': 'critical',
-                    'icon': 'fa-hospital-o',
-                    'title': 'Highest CHC Shortfall',
-                    'value': f"{df.loc[max_idx, 'CHCs % Shortfall']:.0f}%",
-                    'description': f"{df.loc[max_idx, 'State/UT']} has the highest CHC shortfall at {df.loc[max_idx, 'CHCs % Shortfall']:.0f}%"
-                })
-        
-        df['Sub Centres % Shortfall'] = pd.to_numeric(df['Sub Centres % Shortfall'])
-        if not df.empty:
-            max_idx = df['Sub Centres % Shortfall'].idxmax()
-            if df.loc[max_idx, 'Sub Centres % Shortfall'] > 0:
-                insights.append({
-                    'type': 'warning',
-                    'icon': 'fa-building',
-                    'title': 'Highest Sub Centre Shortfall',
-                    'value': f"{df.loc[max_idx, 'Sub Centres % Shortfall']:.0f}%",
-                    'description': f"{df.loc[max_idx, 'State/UT']} has the highest Sub Centres shortfall at {df.loc[max_idx, 'Sub Centres % Shortfall']:.0f}%"
-                })
-    
-    if 'imr' in dataframes and not dataframes['imr'].empty:
-        df = dataframes['imr'].copy()
-        max_idx = df['IMR Total'].idxmax()
-        insights.append({
-            'type': 'critical',
-            'icon': 'fa-child',
-            'title': 'Highest Infant Mortality',
-            'value': f"{df.loc[max_idx, 'IMR Total']} per 1000",
-            'description': f"{df.loc[max_idx, 'State/UT']} has IMR of {df.loc[max_idx, 'IMR Total']} per 1000 live births"
-        })
-        
-        min_idx = df['IMR Total'].idxmin()
-        insights.append({
-            'type': 'success',
-            'icon': 'fa-thumbs-up',
-            'title': 'Lowest Infant Mortality',
-            'value': f"{df.loc[min_idx, 'IMR Total']} per 1000",
-            'description': f"{df.loc[min_idx, 'State/UT']} has the lowest IMR of {df.loc[min_idx, 'IMR Total']}"
-        })
-    
-    if 'function_infra_rural' in dataframes and not dataframes['function_infra_rural'].empty:
-        df = dataframes['function_infra_rural'].copy()
-       
-        df['PHC_Growth'] = ((df['PHCs 2023'] - df['PHCs 2005']) / df['PHCs 2005'].replace(0, 1)) * 100
-        df['CHC_Growth'] = ((df['CHCs 2023'] - df['CHCs 2005']) / df['CHCs 2005'].replace(0, 1)) * 100
-        
-        max_phc_idx = df['PHC_Growth'].idxmax()
-        if df.loc[max_phc_idx, 'PHC_Growth'] > 0:
+        if phc_shortfall:
             insights.append({
-                'type': 'success',
-                'icon': 'fa-line-chart',
-                'title': 'Highest PHC Growth (2005-2023)',
-                'value': f"+{df.loc[max_phc_idx, 'PHC_Growth']:.0f}%",
-                'description': f"{df.loc[max_phc_idx, 'State/UT']} achieved {df.loc[max_phc_idx, 'PHC_Growth']:.0f}% growth in PHCs"
+                'type': 'critical',
+                'icon': 'fa-exclamation-triangle',
+                'title': 'Highest PHC Shortfall',
+                'value': f"{phc_shortfall.phc_shortfall_pct:.0f}%",
+                'description': f"{phc_shortfall.state_ut} has the highest PHC shortfall at {phc_shortfall.phc_shortfall_pct:.0f}%"
+            })
+        chc_shortfall = db.query(models.Shortfall).filter(
+            models.Shortfall.chc_shortfall_pct > 0
+        ).order_by(models.Shortfall.chc_shortfall_pct.desc()).first()
+        
+        if chc_shortfall:
+            insights.append({
+                'type': 'critical',
+                'icon': 'fa-hospital-o',
+                'title': 'Highest CHC Shortfall',
+                'value': f"{chc_shortfall.chc_shortfall_pct:.0f}%",
+                'description': f"{chc_shortfall.state_ut} has the highest CHC shortfall at {chc_shortfall.chc_shortfall_pct:.0f}%"
             })
         
-        max_chc_idx = df['CHC_Growth'].idxmax()
-        if df.loc[max_chc_idx, 'CHC_Growth'] > 0:
-            insights.append({
-                'type': 'success',
-                'icon': 'fa-area-chart',
-                'title': 'Highest CHC Growth (2005-2023)',
-                'value': f"+{df.loc[max_chc_idx, 'CHC_Growth']:.0f}%",
-                'description': f"{df.loc[max_chc_idx, 'State/UT']} achieved {df.loc[max_chc_idx, 'CHC_Growth']:.0f}% growth in CHCs"
-            })
-    
-    if 'mo_phc_rural' in dataframes and not dataframes['mo_phc_rural'].empty:
-        df = dataframes['mo_phc_rural'].copy()
-        df['Vacant 2023'] = pd.to_numeric(df['Vacant 2023']).fillna(0)
-        df['Vacancy_Rate'] = (df['Vacant 2023'] / df['Sanctioned 2023'].replace(0, 1)) * 100
+        sc_shortfall = db.query(models.Shortfall).filter(
+            models.Shortfall.sc_shortfall_pct > 0
+        ).order_by(models.Shortfall.sc_shortfall_pct.desc()).first()
         
-        max_idx = df['Vacancy_Rate'].idxmax()
-        if df.loc[max_idx, 'Vacancy_Rate'] > 0:
+        if sc_shortfall:
             insights.append({
                 'type': 'warning',
-                'icon': 'fa-user-md',
-                'title': 'Highest Doctor Vacancy Rate',
-                'value': f"{df.loc[max_idx, 'Vacancy_Rate']:.0f}%",
-                'description': f"{df.loc[max_idx, 'State/UT']} has {df.loc[max_idx, 'Vacancy_Rate']:.0f}% doctor vacancies in PHCs"
+                'icon': 'fa-building',
+                'title': 'Highest Sub Centre Shortfall',
+                'value': f"{sc_shortfall.sc_shortfall_pct:.0f}%",
+                'description': f"{sc_shortfall.state_ut} has the highest Sub Centres shortfall at {sc_shortfall.sc_shortfall_pct:.0f}%"
             })
-    
-    if 'specialist_chc_rural' in dataframes and not dataframes['specialist_chc_rural'].empty:
-        df = dataframes['specialist_chc_rural'].copy()
-        df['Shortfall 2023'] = pd.to_numeric(df['Shortfall 2023'].replace('-', 0), errors='coerce').fillna(0)
-        total_shortfall = df['Shortfall 2023'].sum()
-        if total_shortfall > 0:
+        
+        highest_imr = db.query(models.IMR).order_by(
+            models.IMR.imr_total.desc()
+        ).first()
+        
+        if highest_imr:
+            insights.append({
+                'type': 'critical',
+                'icon': 'fa-child',
+                'title': 'Highest Infant Mortality',
+                'value': f"{highest_imr.imr_total} per 1000",
+                'description': f"{highest_imr.state_ut} has IMR of {highest_imr.imr_total} per 1000 live births"
+            })
+        
+        lowest_imr = db.query(models.IMR).order_by(
+            models.IMR.imr_total.asc()
+        ).first()
+        if lowest_imr:
+            insights.append({
+                'type': 'success',
+                'icon': 'fa-thumbs-up',
+                'title': 'Lowest Infant Mortality',
+                'value': f"{lowest_imr.imr_total} per 1000",
+                'description': f"{lowest_imr.state_ut} has the lowest IMR of {lowest_imr.imr_total}"
+            })
+        
+        growth_data = db.query(models.FunctionInfraRural).all()
+        if growth_data:
+            max_phc_growth = None
+            max_phc_growth_pct = 0
+            
+            for state in growth_data:
+                if state.phcs_2005 > 0:
+                    growth_pct = ((state.phcs_2023 - state.phcs_2005) / state.phcs_2005) * 100
+                    if growth_pct > max_phc_growth_pct:
+                        max_phc_growth_pct = growth_pct
+                        max_phc_growth = state
+            
+            if max_phc_growth and max_phc_growth_pct > 0:
+                insights.append({
+                    'type': 'success',
+                    'icon': 'fa-line-chart',
+                    'title': 'Highest PHC Growth (2005-2023)',
+                    'value': f"+{max_phc_growth_pct:.0f}%",
+                    'description': f"{max_phc_growth.state_ut} achieved {max_phc_growth_pct:.0f}% growth in PHCs"
+                })
+        
+        if growth_data:
+            max_chc_growth = None
+            max_chc_growth_pct = 0
+            
+            for state in growth_data:
+                if state.chcs_2005 > 0:
+                    growth_pct = ((state.chcs_2023 - state.chcs_2005) / state.chcs_2005) * 100
+                    if growth_pct > max_chc_growth_pct:
+                        max_chc_growth_pct = growth_pct
+                        max_chc_growth = state
+            
+            if max_chc_growth and max_chc_growth_pct > 0:
+                insights.append({
+                    'type': 'success',
+                    'icon': 'fa-area-chart',
+                    'title': 'Highest CHC Growth (2005-2023)',
+                    'value': f"+{max_chc_growth_pct:.0f}%",
+                    'description': f"{max_chc_growth.state_ut} achieved {max_chc_growth_pct:.0f}% growth in CHCs"
+                })
+        
+        doctor_data = db.query(models.MOPHCRural).all()
+        if doctor_data:
+            max_vacancy = None
+            max_vacancy_rate = 0
+            
+            for state in doctor_data:
+                if state.sanctioned_2023 > 0:
+                    vacancy_rate = (state.vacant_2023 / state.sanctioned_2023) * 100
+                    if vacancy_rate > max_vacancy_rate:
+                        max_vacancy_rate = vacancy_rate
+                        max_vacancy = state
+            
+            if max_vacancy and max_vacancy_rate > 0:
+                insights.append({
+                    'type': 'warning',
+                    'icon': 'fa-user-md',
+                    'title': 'Highest Doctor Vacancy Rate',
+                    'value': f"{max_vacancy_rate:.0f}%",
+                    'description': f"{max_vacancy.state_ut} has {max_vacancy_rate:.0f}% doctor vacancies in PHCs"
+                })
+        
+        total_specialist_shortfall = db.query(
+            func.sum(models.SpecialistCHCRural.shortfall_2023)
+        ).scalar()
+        if total_specialist_shortfall and total_specialist_shortfall > 0:
             insights.append({
                 'type': 'critical',
                 'icon': 'fa-stethoscope',
                 'title': 'National Specialist Shortfall',
-                'value': f"{int(total_shortfall):,}",
-                'description': f"India faces a shortfall of {int(total_shortfall):,} specialists at CHCs"
+                'value': f"{int(total_specialist_shortfall):,}",
+                'description': f"India faces a shortfall of {int(total_specialist_shortfall):,} specialists at CHCs"
             })
-    
-    return insights
+        
+        return insights
+    finally:
+        db.close()
 
-def get_overview_ranking(dataframes):
+
+def get_overview_ranking():
+    db = get_db()
     rankings = {}
     
-    if 'imr' in dataframes and not dataframes['imr'].empty:
-        df = dataframes['imr'].copy()
-        df_sorted = df.sort_values('IMR Total')
-        rankings['imr_best'] = df_sorted.head(5)[['State/UT', 'IMR Total']].to_dict('records')
-        rankings['imr_worst'] = df_sorted.tail(5)[['State/UT', 'IMR Total']].to_dict('records')[::-1]
-    
-    if 'shortfall' in dataframes and not dataframes['shortfall'].empty:
-        df = dataframes['shortfall'].copy()
-        df['PHCs % Shortfall'] = pd.to_numeric(df['PHCs % Shortfall'])
-        df_sorted = df.sort_values('PHCs % Shortfall', ascending=False)
-        rankings['phc_shortfall_worst'] = df_sorted[df_sorted['PHCs % Shortfall'] > 0].head(5)[['State/UT', 'PHCs % Shortfall']].to_dict('records')
-    
-    return rankings
+    try:
+        imr_best = db.query(models.IMR).order_by(
+            models.IMR.imr_total.asc()
+        ).limit(5).all()
+        rankings['imr_best'] = [
+            {'State/UT': state.state_ut, 'IMR Total': state.imr_total}
+            for state in imr_best
+        ]
 
-def get_shortfall(dataframes):
+        imr_worst = db.query(models.IMR).order_by(
+            models.IMR.imr_total.desc()
+        ).limit(5).all()
+        rankings['imr_worst'] = [
+            {'State/UT': state.state_ut, 'IMR Total': state.imr_total}
+            for state in imr_worst
+        ]
 
-    if 'shortfall' not in dataframes or dataframes['shortfall'].empty:
-        return {}
-    
-    df = dataframes['shortfall'].copy()
-    
-    for col in ['Sub Centres % Shortfall', 'PHCs % Shortfall', 'CHCs % Shortfall']:
-        df[col] = pd.to_numeric(df[col])
-    
-    return {
-        'labels': df['State/UT'].tolist(),
-        'sc_shortfall': df['Sub Centres % Shortfall'].tolist(),
-        'phc_shortfall': df['PHCs % Shortfall'].tolist(),
-        'chc_shortfall': df['CHCs % Shortfall'].tolist(),
-        'sc_required': df['Sub Centres R'].tolist(),
-        'sc_present': df['Sub Centres P'].tolist(),
-        'phc_required': df['PHCs R'].tolist(),
-        'phc_present': df['PHCs P'].tolist(),
-        'chc_required': df['CHCs R'].tolist(),
-        'chc_present': df['CHCs P'].tolist(),
-    }
+        phc_shortfall = db.query(models.Shortfall).filter(
+            models.Shortfall.phc_shortfall_pct > 0
+        ).order_by(models.Shortfall.phc_shortfall_pct.desc()).limit(5).all()
+        rankings['phc_shortfall_worst'] = [
+            {'State/UT': state.state_ut, 'PHCs % Shortfall': state.phc_shortfall_pct}
+            for state in phc_shortfall
+        ]
+        return rankings
+    finally:
+        db.close()
+
+
+def get_shortfall():
+    db = get_db()
+    try:
+        shortfall_data = db.query(models.Shortfall).all()
+        if not shortfall_data:
+            return {}
+        return {
+            'labels': [state.state_ut for state in shortfall_data],
+            'sc_shortfall': [state.sc_shortfall_pct for state in shortfall_data],
+            'phc_shortfall': [state.phc_shortfall_pct for state in shortfall_data],
+            'chc_shortfall': [state.chc_shortfall_pct for state in shortfall_data],
+            'sc_required': [state.sc_required for state in shortfall_data],
+            'sc_present': [state.sc_present for state in shortfall_data],
+            'phc_required': [state.phc_required for state in shortfall_data],
+            'phc_present': [state.phc_present for state in shortfall_data],
+            'chc_required': [state.chc_required for state in shortfall_data],
+            'chc_present': [state.chc_present for state in shortfall_data],
+        }
+    finally:
+        db.close()

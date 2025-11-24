@@ -293,7 +293,6 @@
     $(document).ready(function () {
         populateHealthIndicatorChart(indicatorData);
 
-        // Search bar function
         $('#imrSearch').on('keyup', function () {
             const value = $(this).val().toLowerCase();
             $('#imrTableBody tr').filter(function () {
