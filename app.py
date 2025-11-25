@@ -1,173 +1,95 @@
 from flask import Flask, jsonify, render_template, request
-from data import load_all_data
 from overview_stats import get_national_stats, get_insights, get_overview_ranking, get_shortfall
+from comparison import get_comparison_data, get_yearly_comparison
+from state_view import get_state_stats, get_state_comparison_data, get_state_list_data
+from district_view import get_district_data
+from health_indicator import get_health_indicator
+from manpower import get_manpower_data
+from askai import processQuery
 import json
-import os
-from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy.ext.automap import automap_base
-from models import MoPhcRural, SpecialistChcRural, NursingRural, PharmacistRural
+
 app = Flask(__name__)
 
-basedir = os.path.abspath(os.path.dirname(__file__))
 
-# Configure SQLite database
-# This creates a file named 'health_data.db' in your project folder
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'data', 'health_data.db')
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
-db = SQLAlchemy(app)
-def row_to_dict(row):
-    """
-    Converts a SQLAlchemy Model object to a dictionary.
-    
-    CRITICAL: This maps the 'Python Attribute' value back to the 'DB Column Name' key.
-    Example: 
-      Model has: required = db.Column('Required 2023', ...)
-      Result dict: {'Required 2023': 500}
-      
-    This ensures your frontend (which looks for 'Required 2023') continues to work.
-    """
-    data = {}
-    for column in row.__table__.columns:
-        # column.name is the Database name (e.g., "Required 2023")
-        # column.key is the Python attribute name (e.g., "required")
-        data[column.name] = getattr(row, column.key)
-    return data
-
-def fetch_data(model_class):
-    """Safely queries the DB and returns a list of dicts."""
-    try:
-        results = db.session.query(model_class).all()
-        return [row_to_dict(row) for row in results]
-    except Exception as e:
-        print(f"❌ Error querying {model_class.__tablename__}: {e}")
-        return []
-# Routes
 @app.route('/')
 def dashboard():
-    national_stats = get_national_stats(dataframes)
-    insights = get_insights(dataframes)
-    rankings = get_overview_ranking(dataframes)
-    shortfall_data = get_shortfall(dataframes)
+    national_stats = get_national_stats()
+    insights = get_insights()
+    rankings = get_overview_ranking()
+    shortfall_data = get_shortfall()
 
-    return render_template('dashboard.html', 
-                          national_stats=national_stats, 
-                          insights=insights,
-                          rankings=rankings,
-                          shortfall_data=json.dumps(shortfall_data))
-
-@app.route('/api/national-stats')
-def api_national_stats():
-    return jsonify(get_national_stats(dataframes))
-
-dataframes = load_all_data()
-
+    return render_template('dashboard.html',
+                           national_stats=national_stats,
+                           insights=insights,
+                           rankings=rankings,
+                           shortfall_data=json.dumps(shortfall_data))
 
 @app.route('/health-indicators')
 def health_indicators():
-    indicators = {}
-    
-    if 'imr' in dataframes and not dataframes['imr'].empty:
-        indicators['imr'] = dataframes['imr'].to_dict('records')
-    
-    if 'birth_death_rate' in dataframes and not dataframes['birth_death_rate'].empty:
-        indicators['birth_death'] = dataframes['birth_death_rate'].to_dict('records')
-
-    if 'state_density' in dataframes and not dataframes['state_density'].empty:
-        indicators['density'] = dataframes['state_density'].to_dict('records')
-
+    indicators = get_health_indicator()
     return render_template('health_indicators.html',
-                          indicators=json.dumps(indicators))
+                           indicators=json.dumps(indicators))
 
 
-# @app.route('/manpower')
-# def manpower():
-#     manpower_data = {}
-    
-#     if 'mo_phc_rural' in dataframes and not dataframes['mo_phc_rural'].empty:
-#         df = dataframes['mo_phc_rural'].copy()
-#         manpower_data['doctors'] = df.to_dict('records')
-
-#     if 'specialist_chc_rural' in dataframes and not dataframes['specialist_chc_rural'].empty:
-#         df = dataframes['specialist_chc_rural'].copy()
-#         manpower_data['specialists'] = df.to_dict('records')
-    
-#     if 'nursing_rural' in dataframes and not dataframes['nursing_rural'].empty:
-#         df = dataframes['nursing_rural'].copy()
-#         manpower_data['nursing'] = df.to_dict('records')
-
-#     if 'pharmacist_rural' in dataframes and not dataframes['pharmacist_rural'].empty:
-#         df = dataframes['pharmacist_rural'].copy()
-#         manpower_data['pharmacists'] = df.to_dict('records')
-        
-#     return render_template('manpower.html', manpower_data=json.dumps(manpower_data))
-# @app.route('/manpower')
-# def manpower():
-#     manpower_data = {}
-    
-#     print("--- DEBUG: Fetching Manpower Data ---")
-
-#     # 1. Doctors
-#     doctors_list = db.session.query(MoPhcRural).all()
-#     manpower_data['doctors'] = [row_to_dict(row) for row in doctors_list]
-#     print(f"Doctors found: {len(manpower_data['doctors'])}")
-
-#     # 2. Specialists
-#     specialists_list = db.session.query(SpecialistChcRural).all()
-#     manpower_data['specialists'] = [row_to_dict(row) for row in specialists_list]
-#     print(f"Specialists found: {len(manpower_data['specialists'])}")
-
-#     # 3. Nursing
-#     nursing_list = db.session.query(NursingRural).all()
-#     manpower_data['nursing'] = [row_to_dict(row) for row in nursing_list]
-
-#     # 4. Pharmacists
-#     pharmacists_list = db.session.query(PharmacistRural).all()
-#     manpower_data['pharmacists'] = [row_to_dict(row) for row in pharmacists_list]
-        
-#     # Print the FINAL data structure to check
-#     #print(json.dumps(manpower_data)) 
-
-# @app.route('/manpower')
-# def manpower():
-#     manpower_data = {}
-    
-#     print("--- DEBUG: Fetching Manpower Data (ORM getattr) ---")
-
-#     # 1. Doctors
-#     manpower_data['doctors'] = fetch_table_data(MoPhcRural)
-#     print(f"Doctors found: {len(manpower_data['doctors'])}")
-
-#     # 2. Specialists
-#     manpower_data['specialists'] = fetch_table_data(SpecialistChcRural)
-    
-#     # 3. Nursing
-#     manpower_data['nursing'] = fetch_table_data(NursingRural)
-
-#     # 4. Pharmacists
-#     manpower_data['pharmacists'] = fetch_table_data(PharmacistRural)
-        
-#     return render_template('manpower.html', manpower_data=json.dumps(manpower_data))
 @app.route('/manpower')
 def manpower():
-    manpower_data = {}
-    
-    print("\n--- DEBUG: Fetching Manpower Data (Explicit Models) ---")
-
-    # 1. Doctors
-    manpower_data['doctors'] = fetch_data(MoPhcRural)
-    print(f"Doctors found: {len(manpower_data['doctors'])}")
-
-    # 2. Specialists
-    manpower_data['specialists'] = fetch_data(SpecialistChcRural)
-    
-    # 3. Nursing
-    manpower_data['nursing'] = fetch_data(NursingRural)
-
-    # 4. Pharmacists
-    manpower_data['pharmacists'] = fetch_data(PharmacistRural)
-        
+    manpower_data = get_manpower_data()
     return render_template('manpower.html', manpower_data=json.dumps(manpower_data))
-    
+
+
+@app.route('/state/<state_name>')
+def state_view(state_name):
+    state_stats = get_state_stats(state_name)
+    national_stats = get_national_stats()
+
+    comparison = get_state_comparison_data(state_name)
+
+    return render_template('state_view.html',
+                           state_stats=state_stats,
+                           national_stats=national_stats,
+                           comparison=comparison,
+                           state_name=state_name)
+
+
+@app.route('/districts')
+def districts():
+    district_data = get_district_data()
+    return render_template('districts.html',
+                           states=district_data['states'],
+                           districts=json.dumps(district_data['districts']))
+
+
+@app.route('/comparison')
+def comparison():
+    comparison_data = get_comparison_data()
+    yearly_data = get_yearly_comparison()
+
+    return render_template('comparison.html',
+                           comparison_data=json.dumps(comparison_data),
+                           yearly_data=json.dumps(yearly_data))
+
+@app.route('/ask-ai')
+def ask_ai():
+    return render_template('ask_ai.html')
+
+@app.route('/api/ask-ai', methods=['POST'])
+def api_ask_ai():
+    data = request.get_json()
+    query = data.get('query', '')
+    if not query:
+        return jsonify({'answer': 'Please provide a query to answer', 'success': False}), 400
+        
+    result = processQuery(query)
+    return jsonify(result)
+
+def get_state_list():
+    return get_state_list_data()
+
+@app.context_processor
+def inject_common_data():
+    return {
+        'states': get_state_list()
+    }
+
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
