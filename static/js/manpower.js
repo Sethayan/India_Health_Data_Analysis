@@ -223,12 +223,20 @@ function initializeManPowerStats(manpowerData) {
                     type: 'bar',
                     data: {
                         labels: nursing.map(n => truncateLabel(n['State/UT'], 10)),
-                        datasets: [{
-                            label: 'In Position 2023',
-                            data: nursing.map(n => n['In Position 2023']),
-                            backgroundColor: 'rgba(13, 202, 240, 0.8)',
-                            borderRadius: 4
-                        }]
+                        datasets: [
+                            {
+                                label: 'Required',
+                                data: nursing.map(n => n['Required 2023']),
+                                backgroundColor: 'rgba(13, 110, 253, 0.2)',
+                                borderRadius: 4
+                            },
+                            {
+                                label: 'In Position 2023',
+                                data: nursing.map(n => n['In Position 2023']),
+                                backgroundColor: 'rgba(13, 202, 240, 0.8)',
+                                borderRadius: 4
+                            }
+                        ]
                     },
                     options: {
                         maintainAspectRatio: false,
@@ -278,12 +286,20 @@ function initializeManPowerStats(manpowerData) {
                         type: 'bar',
                         data: {
                             labels: pharma.map(p => truncateLabel(p['State/UT'], 10)),
-                            datasets: [{
-                                label: 'In Position 2023',
-                                data: pharma.map(p => p['In Position 2023']),
-                                backgroundColor: 'rgba(255, 193, 7, 0.8)',
-                                borderRadius: 4
-                            }]
+                            datasets: [
+                                {
+                                    label: 'Required 2023',
+                                    data: pharma.map(p => p['Required 2023']),
+                                    backgroundColor: 'rgba(13, 110, 253, 0.2)',
+                                    borderRadius: 4
+                                },
+                                {
+                                    label: 'In Position 2023',
+                                    data: pharma.map(p => p['In Position 2023']),
+                                    backgroundColor: 'rgba(255, 193, 7, 0.8)',
+                                    borderRadius: 4
+                                }
+                            ]
                         },
                         options: {
                             maintainAspectRatio: false,
