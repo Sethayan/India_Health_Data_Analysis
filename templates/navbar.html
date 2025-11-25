@@ -16,7 +16,6 @@
                         <i class="fa fa-dashboard me-1"></i> Dashboard
                     </a>
                 </li>
-                
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle {{ 'active' if request.endpoint == 'state_view' }}" href="#" data-bs-toggle="dropdown">
                         <i class="fa fa-map-marker me-1"></i> State View
@@ -27,28 +26,29 @@
                         {% endfor %}
                     </ul>
                 </li>
-                
                 <li class="nav-item">
                     <a class="nav-link {{ 'active' if request.endpoint == 'districts' }}" href="{{ url_for('districts') }}">
                         <i class="fa fa-building-o me-1"></i> District View
                     </a>
                 </li>
-                
                 <li class="nav-item">
                     <a class="nav-link" href="{{ url_for('comparison') }}">
                         <i class="fa fa-exchange me-1"></i> Comparison
                     </a>
                 </li>
-                
                 <li class="nav-item">
                     <a class="nav-link {{ 'active' if request.endpoint == 'manpower' }}" href="{{ url_for('manpower') }}">
                         <i class="fa fa-users me-1"></i> Manpower View
                     </a>
                 </li>
-                
                 <li class="nav-item">
                     <a class="nav-link {{ 'active' if request.endpoint == 'health_indicators' }}" href="{{ url_for('health_indicators') }}">
                         <i class="fa fa-heartbeat me-1"></i> Health Indicators
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {{ 'active' if request.endpoint == 'ask_ai' }}" href="{{ url_for('ask_ai') }}">
+                        <i class="fa fa-comments me-1"></i> Ask AI
                     </a>
                 </li>
             </ul>

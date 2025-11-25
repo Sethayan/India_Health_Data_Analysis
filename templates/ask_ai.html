@@ -1,0 +1,62 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}Ask AI{% endblock %}
+
+{% block content %}
+<div class="page-header mb-4">
+    <div class="row align-items-center">
+        <div class="col">
+            <h1 class="page-title">
+                <i class="fa fa-comments text-primary me-2"></i>
+                Ask AI
+            </h1>
+            <p class="text-muted mb-0">Ask questions using AI.</p>
+        </div>
+        <div class="col-auto">
+            <button id="clearHistoryBtn" class="btn btn-outline-danger btn-sm">
+                <i class="fa fa-trash me-1"></i> Clear History
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body p-4">
+                <form id="chatForm">
+                    <div class="mb-3">
+                        <label for="userQuery" class="form-label fw-bold">Your Question</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control form-control-lg" id="userQuery" 
+                                   placeholder="E.g., Which state has the highest shortfall of surgeons?" required>
+                            <button class="btn btn-primary px-4" type="submit" id="sendBtn">
+                                <i class="fa fa-paper-plane me-2"></i> Ask
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div id="loadingIndicator" class="text-center mb-4" style="display: none;">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-2 text-muted">Analyzing data...</p>
+        </div>
+
+        <div id="chatHistory" class="d-flex flex-column gap-3">
+            </div>
+        
+        <div id="emptyState" class="text-center py-5 text-muted">
+            <i class="fa fa-comment-o fa-3x mb-3 opacity-25"></i>
+            <p>No queries till now.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/askai.js') }}"></script>
+{% endblock %}

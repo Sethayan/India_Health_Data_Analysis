@@ -1,10 +1,11 @@
-from flask import Flask, render_template
+from flask import Flask, jsonify, render_template, request
 from overview_stats import get_national_stats, get_insights, get_overview_ranking, get_shortfall
 from comparison import get_comparison_data, get_yearly_comparison
 from state_view import get_state_stats, get_state_comparison_data, get_state_list_data
 from district_view import get_district_data
 from health_indicator import get_health_indicator
 from manpower import get_manpower_data
+from askai import processQuery
 import json
 
 app = Flask(__name__)
@@ -67,10 +68,22 @@ def comparison():
                            comparison_data=json.dumps(comparison_data),
                            yearly_data=json.dumps(yearly_data))
 
+@app.route('/ask-ai')
+def ask_ai():
+    return render_template('ask_ai.html')
+
+@app.route('/api/ask-ai', methods=['POST'])
+def api_ask_ai():
+    data = request.get_json()
+    query = data.get('query', '')
+    if not query:
+        return jsonify({'answer': 'Please provide a query to answer', 'success': False}), 400
+        
+    result = processQuery(query)
+    return jsonify(result)
 
 def get_state_list():
     return get_state_list_data()
-
 
 @app.context_processor
 def inject_common_data():
