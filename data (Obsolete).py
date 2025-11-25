@@ -1,11 +1,4 @@
-import os
-import pandas as pd
-
-DATA_DIRECTORY = os.path.join(os.path.dirname(__file__), 'data')
-
-def load_all_data():
-    dataframes = {}
-
+def mapping():
     csv_files = {
         'sc_phc_chc_count': 'State Wise SC_PHC_CHC Count.csv',
         'sdh_dh_mc_count': 'State Wise SDH_DH_MC Count.csv',
@@ -34,18 +27,3 @@ def load_all_data():
         'building_phc_position': 'State wise building position PHC rural.csv',
         'building_chc_position': 'State wise building position CHC rural.csv',
     }
-    
-    for key, filename in csv_files.items():
-        filepath = os.path.join(DATA_DIRECTORY, filename)
-        if os.path.exists(filepath):
-            try:
-                df = pd.read_csv(filepath, encoding='utf-8')
-                dataframes[key] = df
-            except Exception as e:
-                print(f"Error loading {filename}: {e}")
-                dataframes[key] = pd.DataFrame()
-        else:
-            print(f"File not found: {filename}")
-            dataframes[key] = pd.DataFrame()
-    
-    return dataframes
